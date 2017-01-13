@@ -1,0 +1,13 @@
+os:
+- linux
+- osx
+language: rust
+rust:
+- stable
+- beta
+- nightly
+script:
+- cargo test
+- cargo test --no-default-features --features=with-rustc-serialize
+- cargo doc
+

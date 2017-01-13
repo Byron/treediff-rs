@@ -1,0 +1,18 @@
+[package]
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "Find the difference between arbitrary data structures"
+documentation = "https://docs.rs/treediff"
+keywords = ["diff", "structure", "tree", "arbitrary", "general"]
+license = "MIT"
+name = "treediff"
+repository = "https://github.com/Byron/treediff-rs"
+version = "0.1.0"
+
+[dependencies]
+rustc-serialize = {version = "0.3.22", optional = true}
+
+[features]
+with-std = []
+default = ["with-std"]
+with-rustc-serialize = ["rustc-serialize"]
+
