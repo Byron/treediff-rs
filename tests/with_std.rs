@@ -3,7 +3,7 @@ use treediff::Value;
 
 fn use_val_borrowed<V >(v: &V) where V: Value{
     assert!(v.is_scalar());
-    assert!(v.eq(v));
+    assert!(v == v);
 }
 
 fn use_val_owned<V >(v: V) where V: Value{
@@ -11,7 +11,7 @@ fn use_val_owned<V >(v: V) where V: Value{
 }
 
 fn assert_scalar<V>(l: V, r: V) where V: Value {
-    assert!(!l.eq(&r));
+    assert!(l != r);
     use_val_borrowed(&l);
     use_val_owned(l);
 }

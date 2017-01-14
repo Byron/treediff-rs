@@ -1,5 +1,4 @@
 
-pub trait Value<Rhs = Self> {
+pub trait Value<Rhs = Self> where Self: PartialEq<Rhs> {
     fn is_scalar(&self) -> bool;
-    fn eq(&self, rhs: &Rhs) -> bool;
 }
