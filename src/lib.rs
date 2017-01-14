@@ -3,6 +3,7 @@
 extern crate rustc_serialize;
 
 mod traitdef;
+mod traitimpls;
 
 pub use traitdef::*;
 

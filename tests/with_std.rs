@@ -1,6 +1,27 @@
+extern crate treediff;
+use treediff::Value;
+
+fn use_val_borrowed<V >(v: &V) where V: Value{
+    assert!(v.is_scalar());
+    assert!(v.eq(v));
+}
+
+fn use_val_owned<V >(v: V) where V: Value{
+    use_val_borrowed(&v);
+}
+
+fn assert_scalar<V>(l: V, r: V) where V: Value {
+    assert!(!l.eq(&r));
+    use_val_borrowed(&l);
+    use_val_owned(l);
+}
 
 #[cfg(feature = "with-std")]
 #[test]
-fn std_stuctures() {
-    assert_eq!(true, false);
+fn std_value_string() {
+    let s = String::from("one");
+    let r = String::from("two");
+    assert_scalar(s, r);
 }
+
+
