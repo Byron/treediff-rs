@@ -7,11 +7,10 @@ impl Value for String {
 }
 
 impl<T> Value<T> for Vec<T>
-    where
-        T: PartialEq + Clone,
-        Vec<T>: PartialEq<T>
+    where T: PartialEq + Clone,
+          Vec<T>: PartialEq<T>
 {
-    fn items(&self) -> Option<Box<Iterator<Item = T>>> {
+    fn items<'a>(&'a self) -> Option<Box<Iterator<Item = T> + 'a>> {
         Some(Box::new(self.iter().cloned()))
     }
 }
