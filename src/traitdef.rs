@@ -1,5 +1,6 @@
 
 pub trait Value: PartialEq<Self> {
     type Item;
-    fn items(&self) -> Option<Vec<Self::Item>>;
+    type Key;
+    fn items(&self) -> Option<Vec<(Self::Key, Self::Item)>>;
 }
