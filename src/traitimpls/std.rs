@@ -1,17 +1,17 @@
 use traitdef::Value;
 
-impl<'a> Value<'a> for String {
+impl Value for String {
     type Item = Self;
-    fn items(&self) -> Option<Box<Iterator<Item = Self>>> {
+    fn items(&self) -> Option<Vec<Self::Item>> {
         None
     }
 }
 
-impl<'a, T> Value<'a> for Vec<T>
-    where T: PartialEq + 'a
+impl<T> Value for Vec<T>
+    where T: PartialEq + Clone
 {
-    type Item = &'a T;
-    fn items(&'a self) -> Option<Box<Iterator<Item = Self::Item> + 'a>> {
-        Some(Box::new(self.iter()))
+    type Item = T;
+    fn items(&self) -> Option<Vec<T>> {
+        Some(self.iter().cloned().collect())
     }
 }
