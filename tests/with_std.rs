@@ -4,7 +4,7 @@ use treediff::Value;
 fn use_val_borrowed<V>(v: &V)
     where V: Value
 {
-    assert!(v.items().is_none());
+//    assert!(v.items().is_none());
     assert!(v == v);
 }
 

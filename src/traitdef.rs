@@ -1,7 +1,4 @@
 
-pub trait Value<Rhs = Self>
-    where Self: PartialEq<Rhs>
+pub trait Value: PartialEq<Self>
 {
-    type Item;
-    fn items(&self) -> Option<Box<Iterator<Item = Self::Item>>>;
 }
