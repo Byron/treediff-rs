@@ -6,4 +6,3 @@ mod traitdef;
 mod traitimpls;
 
 pub use traitdef::*;
-
