@@ -6,6 +6,8 @@ extern crate rustc_serialize;
 mod traitdef;
 mod traitimpls;
 mod diff;
+mod utils;
 
 pub use traitdef::*;
 pub use diff::*;
+pub use utils::*;
