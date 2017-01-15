@@ -7,9 +7,14 @@ mod rustc_json_value {
     use self::rustc_serialize::json::Json;
 
     #[test]
+    fn scalar_value_string() {
+        let j: Json = r#""value""#.parse().unwrap();
+        assert!(j.items().is_none());
+    }
+
+    #[test]
     fn empty_object() {
         let j: Json = r#"{}"#.parse().unwrap();
-        assert!(j == j);
-        assert!(j.items().is_some());
+        assert_eq!(j.items().unwrap().collect::<Vec<_>>(), vec![]);
     }
 }
