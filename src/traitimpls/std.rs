@@ -9,7 +9,7 @@ impl Value for String {
 }
 
 impl<T> Value for Vec<T>
-    where T: PartialEq + Clone
+    where T: PartialEq
 {
     type Item = T;
     type Key = usize;
