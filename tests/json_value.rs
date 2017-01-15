@@ -16,6 +16,14 @@ mod rustc_json_value {
     }
 
     #[test]
+    fn array() {
+        let j: Json = r#"[null, true]"#.parse().unwrap();
+        assert_eq!(j.items().unwrap().collect::<Vec<_>>(),
+                   vec![(JsonKey::Index(0), &Json::Null),
+                        (JsonKey::Index(1), &Json::Boolean(true))]);
+    }
+
+    #[test]
     fn object() {
         let j: Json = r#"{"a": null, "b": true}"#.parse().unwrap();
         assert_eq!(j.items().unwrap().collect::<Vec<_>>(),
