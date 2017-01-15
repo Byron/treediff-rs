@@ -1,8 +1,8 @@
 use traitdef::{Value, Delegate};
 
-pub fn diff<V, D>(l: &V, r: &V, d: &mut D)
+pub fn diff<'a, V, D>(l: &'a V, r: &'a V, d: &mut D)
     where V: Value,
-          D: Delegate<V>
+          D: Delegate<'a, V>
 {
     match (l.items(), r.items()) {
         // two scalars, equal

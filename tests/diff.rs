@@ -4,19 +4,17 @@ extern crate treediff;
 mod diff {
     use treediff::{diff, Delegate};
     #[derive(Debug, PartialEq)]
-    enum ChangeType<V> {
-        Unchanged(V),
+    enum ChangeType<'a, V: 'a> {
+        Unchanged(&'a V),
     }
     #[derive(Default, Debug, PartialEq)]
-    struct Recorder<V> {
-        calls: Vec<ChangeType<V>>,
+    struct Recorder<'a, V: 'a> {
+        calls: Vec<ChangeType<'a, V>>,
     }
 
-    impl<V> Delegate<V> for Recorder<V>
-        where V: Clone
-    {
-        fn unchanged(&mut self, v: &V) {
-            self.calls.push(ChangeType::Unchanged(v.clone()));
+    impl<'a, V> Delegate<'a, V> for Recorder<'a, V> {
+        fn unchanged(&mut self, v: &'a V) {
+            self.calls.push(ChangeType::Unchanged(v));
         }
     }
 
@@ -26,7 +24,7 @@ mod diff {
         let v2 = String::from("value two");
         let mut d = Recorder::default();
         diff(&v, &v2, &mut d);
-        assert_eq!(d.calls, vec![ChangeType::Unchanged(v.clone())]);
+        assert_eq!(d.calls, vec![ChangeType::Unchanged(&v)]);
     }
 
     #[test]
@@ -34,6 +32,6 @@ mod diff {
         let v = String::from("value");
         let mut d = Recorder::default();
         diff(&v, &v, &mut d);
-        assert_eq!(d.calls, vec![ChangeType::Unchanged(v.clone())]);
+        assert_eq!(d.calls, vec![ChangeType::Unchanged(&v)]);
     }
 }
