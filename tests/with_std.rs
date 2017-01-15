@@ -36,15 +36,17 @@ fn std_value_string() {
 #[cfg(feature = "with-std")]
 #[test]
 fn std_value_vec_str() {
-    let l = vec!["one"];
+    let l = vec!["one", "two"];
     let r = vec!["two"];
+    assert_eq!(l.items().unwrap().map(|(i, s)|(i, *s)).collect::<Vec<_>>(), vec![(0, "one"), (1, "two")]);
     assert_non_scalar(l, r);
 }
 
 #[cfg(feature = "with-std")]
 #[test]
-fn std_value_vec_int() {
-    let l = vec![1];
-    let r = vec![2];
+fn std_value_vec_string() {
+    let l = vec![String::from("one")];
+    let r = vec![String::from("two")];
+    assert_eq!(l.items().unwrap().collect::<Vec<_>>(), vec![(0, &String::from("one"))]);
     assert_non_scalar(l, r);
 }

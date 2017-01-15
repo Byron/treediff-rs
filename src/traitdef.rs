@@ -2,5 +2,5 @@
 pub trait Value: PartialEq<Self> {
     type Item;
     type Key;
-    fn items(&self) -> Option<Vec<(Self::Key, Self::Item)>>;
+    fn items<'a>(&'a self) -> Option<Box<Iterator<Item=(Self::Key, &'a Self::Item)> + 'a>>;
 }
