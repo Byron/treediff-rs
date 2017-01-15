@@ -9,7 +9,7 @@ mod diff {
         let v2 = String::from("value two");
         let mut d = Recorder::default();
         diff(&v, &v2, &mut d);
-        assert_eq!(d.calls, vec![ChangeType::Unchanged(&v)]);
+        assert_eq!(d.calls, vec![ChangeType::Modified(&v, &v2)]);
     }
 
     #[test]

@@ -7,4 +7,5 @@ pub trait Value: PartialEq<Self> {
 
 pub trait Delegate<'a, V> {
     fn unchanged(&mut self, _v: &'a V) {}
+    fn modified(&mut self, _v1: &'a V, _v2: &'a V) {}
 }

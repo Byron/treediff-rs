@@ -6,7 +6,9 @@ pub fn diff<'a, V, D>(l: &'a V, r: &'a V, d: &mut D)
 {
     match (l.items(), r.items()) {
         // two scalars, equal
-        (None, None) if l == r => d.unchanged(&l),
+        (None, None) if l == r => d.unchanged(l),
+        // two scalars, different
+        (None, None) => d.modified(l, r),
         _ => unimplemented!(),
     }
 }
