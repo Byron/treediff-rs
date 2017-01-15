@@ -8,6 +8,6 @@ rust:
 - nightly
 script:
 - cargo test
-- cargo test --no-default-features --features=with-rustc-serialize
+- cargo test --features=with-rustc-serialize
 - cargo doc
 
