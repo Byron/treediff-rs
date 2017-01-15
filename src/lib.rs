@@ -9,5 +9,6 @@ mod diff;
 mod utils;
 
 pub use traitdef::*;
+pub use traitimpls::*;
 pub use diff::*;
 pub use utils::*;

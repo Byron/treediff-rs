@@ -4,12 +4,23 @@ extern crate treediff;
 mod rustc_json_value {
     extern crate rustc_serialize;
     use treediff::Value;
+    use treediff::JsonKey;
     use self::rustc_serialize::json::Json;
 
     #[test]
-    fn scalar_value_string() {
-        let j: Json = r#""value""#.parse().unwrap();
-        assert!(j.items().is_none());
+    fn scalar_values() {
+        for v in &["null", "true", "1.23", "-1234456", "1234456", "\"string\""] {
+            let j: Json = v.parse().unwrap();
+            assert!(j.items().is_none());
+        }
+    }
+
+    #[test]
+    fn object() {
+        let j: Json = r#"{"a": null, "b": true}"#.parse().unwrap();
+        assert_eq!(j.items().unwrap().collect::<Vec<_>>(),
+                   vec![(JsonKey::String("a".into()), &Json::Null),
+                        (JsonKey::String("b".into()), &Json::Boolean(true))]);
     }
 
     #[test]
