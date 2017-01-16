@@ -7,7 +7,6 @@ rust:
 - beta
 - nightly
 script:
-- cargo test
 - cargo test --features=with-rustc-serialize
 - cargo doc
 
