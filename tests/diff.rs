@@ -19,4 +19,21 @@ mod diff {
         diff(&v, &v, &mut d);
         assert_eq!(d.calls, vec![ChangeType::Unchanged(&v)]);
     }
+
+    #[test]
+    fn vec_equal() {
+        let v = vec![1, 2];
+        let mut d = Recorder::default();
+        diff(&v, &v, &mut d);
+        assert_eq!(d.calls, vec![ChangeType::Unchanged(&v)]);
+    }
+
+    #[test]
+    fn vec_modified() {
+        let v1 = vec![1, 2];
+        let v2 = vec![1, 3];
+        let mut d = Recorder::default();
+        diff(&v1, &v2, &mut d);
+        assert_eq!(d.calls, vec![ChangeType::Modified(&v1, &v2)]);
+    }
 }

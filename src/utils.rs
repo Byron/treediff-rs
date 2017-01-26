@@ -5,6 +5,7 @@ pub enum ChangeType<'a, V: 'a> {
     Unchanged(&'a V),
     Modified(&'a V, &'a V),
 }
+
 #[derive(Default, Debug, PartialEq)]
 pub struct Recorder<'a, V: 'a> {
     pub calls: Vec<ChangeType<'a, V>>,

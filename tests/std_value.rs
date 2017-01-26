@@ -45,7 +45,7 @@ mod std_value {
         l.insert("there", 42);
 
         let sorted = {
-            let mut s = l.items().unwrap().collect::<Vec<_>>();
+            let mut s = Value::items(&l).unwrap().collect::<Vec<_>>();
             s.sort_by_key(|v| v.0);
             s
         };
