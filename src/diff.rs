@@ -5,6 +5,7 @@ use std::collections::BTreeSet;
 pub fn diff<'a, V, D>(l: &'a V, r: &'a V, d: &mut D)
     where V: Value,
           <V as Value>::Key: Ord,
+          <V as Value>::Item: Value,
           D: Delegate<'a, V>
 {
     match (l.items(), r.items()) {
@@ -16,6 +17,8 @@ pub fn diff<'a, V, D>(l: &'a V, r: &'a V, d: &mut D)
         (Some(li), Some(ri)) => {
             let mut sl: BTreeSet<OrdByKey<_, _>> = BTreeSet::new();
             sl.extend(li.map(Into::into));
+            let mut sr: BTreeSet<OrdByKey<_, _>> = BTreeSet::new();
+            sr.extend(ri.map(Into::into));
         }
         _ => unimplemented!(),
     }

@@ -1,39 +1,34 @@
 extern crate treediff;
 
 
+#[cfg(feature = "with-rustc-serialize")]
 mod diff {
+    extern crate rustc_serialize;
     use treediff::{diff, ChangeType, Recorder};
+    use self::rustc_serialize::json::Json;
+
     #[test]
     fn scalar_modified() {
-        let v = String::from("value");
-        let v2 = String::from("value two");
+        let v1: Json = r#""one""#.parse().unwrap();
+        let v2: Json = r#""two""#.parse().unwrap();
         let mut d = Recorder::default();
-        diff(&v, &v2, &mut d);
-        assert_eq!(d.calls, vec![ChangeType::Modified(&v, &v2)]);
+        diff(&v1, &v2, &mut d);
+        assert_eq!(d.calls, vec![ChangeType::Modified(&v1, &v2)]);
     }
 
     #[test]
     fn scalar_equal() {
-        let v = String::from("value");
+        let v: Json = r#""one""#.parse().unwrap();
         let mut d = Recorder::default();
         diff(&v, &v, &mut d);
         assert_eq!(d.calls, vec![ChangeType::Unchanged(&v)]);
     }
 
     #[test]
-    fn vec_equal() {
-        let v = vec![1, 2];
+    fn object_equal() {
+        let v: Json = r#"{"one": 1}"#.parse().unwrap();
         let mut d = Recorder::default();
         diff(&v, &v, &mut d);
         assert_eq!(d.calls, vec![ChangeType::Unchanged(&v)]);
-    }
-
-    #[test]
-    fn vec_modified() {
-        let v1 = vec![1, 2];
-        let v2 = vec![1, 3];
-        let mut d = Recorder::default();
-        diff(&v1, &v2, &mut d);
-        assert_eq!(d.calls, vec![ChangeType::Modified(&v1, &v2)]);
     }
 }

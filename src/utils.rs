@@ -6,9 +6,15 @@ pub enum ChangeType<'a, V: 'a> {
     Modified(&'a V, &'a V),
 }
 
-#[derive(Default, Debug, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct Recorder<'a, V: 'a> {
     pub calls: Vec<ChangeType<'a, V>>,
+}
+
+impl<'a, V> Default for Recorder<'a, V> {
+    fn default() -> Self {
+        Recorder { calls: Vec::new() }
+    }
 }
 
 impl<'a, V> Delegate<'a, V> for Recorder<'a, V> {

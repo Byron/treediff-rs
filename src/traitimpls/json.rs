@@ -1,7 +1,7 @@
 use traitdef::Value;
 use rustc_serialize::json::Json;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd)]
 pub enum JsonKey {
     Index(usize),
     String(String),
