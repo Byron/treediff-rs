@@ -2,7 +2,7 @@ use traitdef::{Value, Delegate};
 use std::cmp::Ordering;
 use std::collections::BTreeSet;
 
-pub fn diff<'a, V, D>(l: &'a V, r: &'a V, d: &mut D)
+pub fn diff<'a, V, D, AnyV>(l: &'a V, r: &'a V, d: &mut D)
     where V: Value,
           <V as Value>::Key: Ord,
           <V as Value>::Item: Value,
@@ -13,12 +13,21 @@ pub fn diff<'a, V, D>(l: &'a V, r: &'a V, d: &mut D)
         (None, None) if l == r => d.unchanged(l),
         // two scalars, different
         (None, None) => d.modified(l, r),
+        // two objects, equal
         (Some(_), Some(_)) if l == r => d.unchanged(l),
+        // two objects, different
         (Some(li), Some(ri)) => {
             let mut sl: BTreeSet<OrdByKey<_, _>> = BTreeSet::new();
             sl.extend(li.map(Into::into));
             let mut sr: BTreeSet<OrdByKey<_, _>> = BTreeSet::new();
             sr.extend(ri.map(Into::into));
+            for k in sr.union(&sl) {
+                let v1 = sl.get(k).expect("union to work");
+                let v2 = sr.get(k).expect("union to work");
+                if v1.1 == v2.1 {
+                    d.unchanged(v1.1);
+                }
+            }
         }
         _ => unimplemented!(),
     }
