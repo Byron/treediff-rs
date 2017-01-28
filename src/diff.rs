@@ -5,7 +5,6 @@ use std::collections::BTreeSet;
 pub fn diff<'a, V, D>(l: &'a V, r: &'a V, d: &mut D)
     where V: Value<Item = V>,
           V::Key: Ord,
-          V::Item: Value,
           D: Delegate<'a, V>
 {
     match (l.items(), r.items()) {
@@ -26,6 +25,8 @@ pub fn diff<'a, V, D>(l: &'a V, r: &'a V, d: &mut D)
                 let v2 = sr.get(k).expect("union to work");
                 if v1.1 == v2.1 {
                     d.unchanged(v1.1);
+                } else {
+                    d.modified(v1.1, v2.1);
                 }
             }
         }
