@@ -2,10 +2,10 @@ use traitdef::{Value, Delegate};
 use std::cmp::Ordering;
 use std::collections::BTreeSet;
 
-pub fn diff<'a, V, D, AnyV>(l: &'a V, r: &'a V, d: &mut D)
-    where V: Value,
-          <V as Value>::Key: Ord,
-          <V as Value>::Item: Value,
+pub fn diff<'a, V, D>(l: &'a V, r: &'a V, d: &mut D)
+    where V: Value<Item = V>,
+          V::Key: Ord,
+          V::Item: Value,
           D: Delegate<'a, V>
 {
     match (l.items(), r.items()) {
