@@ -2,6 +2,8 @@ use traitdef::Delegate;
 
 #[derive(Debug, PartialEq)]
 pub enum ChangeType<'a, V: 'a> {
+    Removed(&'a V),
+    Added(&'a V),
     Unchanged(&'a V),
     Modified(&'a V, &'a V),
 }
@@ -18,6 +20,12 @@ impl<'a, V> Default for Recorder<'a, V> {
 }
 
 impl<'a, V> Delegate<'a, V> for Recorder<'a, V> {
+    fn removed(&mut self, v: &'a V) {
+        self.calls.push(ChangeType::Removed(v));
+    }
+    fn added(&mut self, v: &'a V) {
+        self.calls.push(ChangeType::Added(v));
+    }
     fn unchanged(&mut self, v: &'a V) {
         self.calls.push(ChangeType::Unchanged(v));
     }

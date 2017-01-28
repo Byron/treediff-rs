@@ -20,14 +20,20 @@ pub fn diff<'a, V, D>(l: &'a V, r: &'a V, d: &mut D)
             sl.extend(li.map(Into::into));
             let mut sr: BTreeSet<OrdByKey<_, _>> = BTreeSet::new();
             sr.extend(ri.map(Into::into));
-            for k in sr.union(&sl) {
-                let v1 = sl.get(k).expect("union to work");
-                let v2 = sr.get(k).expect("union to work");
+            for k in sr.intersection(&sl) {
+                let v1 = sl.get(k).expect("intersection to work");
+                let v2 = sr.get(k).expect("intersection to work");
                 if v1.1 == v2.1 {
                     d.unchanged(v1.1);
                 } else {
                     d.modified(v1.1, v2.1);
                 }
+            }
+            for k in sr.difference(&sl) {
+                d.added(sr.get(k).expect("difference to work").1);
+            }
+            for k in sl.difference(&sr) {
+                d.removed(sl.get(k).expect("difference to work").1);
             }
         }
         _ => unimplemented!(),
