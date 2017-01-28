@@ -64,4 +64,33 @@ mod diff {
         assert_eq!(d.calls,
                    vec![Removed(v1.as_object().unwrap().get("1").unwrap())]);
     }
+
+    #[test]
+    fn nested_object_added_key() {
+        let v1: Json = r#"{"a": {}}"#.parse().unwrap();
+        let v2: Json = r#"{"a": {"1": 1}}"#.parse().unwrap();
+        let mut d = Recorder::default();
+        diff(&v1, &v2, &mut d);
+        assert_eq!(d.calls, vec![Added(v2.find_path(&["a", "1"]).unwrap())]);
+    }
+
+    #[test]
+    fn nested_object_removed_key() {
+        let v1: Json = r#"{"a": {"1": 1}}"#.parse().unwrap();
+        let v2: Json = r#"{"a": {}}"#.parse().unwrap();
+        let mut d = Recorder::default();
+        diff(&v1, &v2, &mut d);
+        assert_eq!(d.calls, vec![Removed(v1.find_path(&["a", "1"]).unwrap())]);
+    }
+
+    #[test]
+    fn nested_object_modified_key() {
+        let v1: Json = r#"{"a": {"1": 1}}"#.parse().unwrap();
+        let v2: Json = r#"{"a": {"1": 2}}"#.parse().unwrap();
+        let mut d = Recorder::default();
+        diff(&v1, &v2, &mut d);
+        assert_eq!(d.calls,
+                   vec![Modified(v1.find_path(&["a", "1"]).unwrap(),
+                                 v2.find_path(&["a", "1"]).unwrap())]);
+    }
 }

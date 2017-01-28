@@ -23,11 +23,7 @@ pub fn diff<'a, V, D>(l: &'a V, r: &'a V, d: &mut D)
             for k in sr.intersection(&sl) {
                 let v1 = sl.get(k).expect("intersection to work");
                 let v2 = sr.get(k).expect("intersection to work");
-                if v1.1 == v2.1 {
-                    d.unchanged(v1.1);
-                } else {
-                    d.modified(v1.1, v2.1);
-                }
+                diff(v1.1, v2.1, d);
             }
             for k in sr.difference(&sl) {
                 d.added(sr.get(k).expect("difference to work").1);
