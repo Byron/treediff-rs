@@ -14,6 +14,8 @@ pub fn diff<'a, V, D>(l: &'a V, r: &'a V, d: &mut D)
         (None, None) => d.modified(l, r),
         // two objects, equal
         (Some(_), Some(_)) if l == r => d.unchanged(l),
+        // object and scalar
+        (Some(_), None) | (None, Some(_)) => d.modified(l, r),
         // two objects, different
         (Some(li), Some(ri)) => {
             let mut sl: BTreeSet<OrdByKey<_, _>> = BTreeSet::new();
@@ -32,7 +34,6 @@ pub fn diff<'a, V, D>(l: &'a V, r: &'a V, d: &mut D)
                 d.removed(sl.get(k).expect("difference to work").1);
             }
         }
-        _ => unimplemented!(),
     }
 }
 

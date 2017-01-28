@@ -93,4 +93,22 @@ mod diff {
                    vec![Modified(v1.find_path(&["a", "1"]).unwrap(),
                                  v2.find_path(&["a", "1"]).unwrap())]);
     }
+
+    #[test]
+    fn object_and_scalar_is_modified() {
+        let v1: Json = r#"{"1": 1}"#.parse().unwrap();
+        let v2: Json = r#""1""#.parse().unwrap();
+        let mut d = Recorder::default();
+        diff(&v1, &v2, &mut d);
+        assert_eq!(d.calls, vec![Modified(&v1, &v2)]);
+    }
+
+    #[test]
+    fn scalar_and_object_is_modified() {
+        let v1: Json = r#""1""#.parse().unwrap();
+        let v2: Json = r#"{"1": 1}"#.parse().unwrap();
+        let mut d = Recorder::default();
+        diff(&v1, &v2, &mut d);
+        assert_eq!(d.calls, vec![Modified(&v1, &v2)]);
+    }
 }
