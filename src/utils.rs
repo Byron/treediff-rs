@@ -23,13 +23,13 @@ impl<'a, K, V> Default for Recorder<'a, K, V> {
     }
 }
 
-fn mk<K>(c: &Vec<K>, k: Option<K>) -> Vec<K>
+fn mk<'b, K>(c: &Vec<K>, k: Option<&'b K>) -> Vec<K>
     where K: Clone
 {
     let mut c = c.clone();
     match k {
         Some(k) => {
-            c.push(k);
+            c.push(k.clone());
             c
         }
         None => c,
@@ -39,22 +39,22 @@ fn mk<K>(c: &Vec<K>, k: Option<K>) -> Vec<K>
 impl<'a, K, V> Delegate<'a, K, V> for Recorder<'a, K, V>
     where K: Clone
 {
-    fn push(&mut self, k: K) {
-        self.cursor.push(k)
+    fn push<'b>(&mut self, k: &'b K) {
+        self.cursor.push(k.clone())
     }
     fn pop(&mut self) {
         self.cursor.pop();
     }
-    fn removed(&mut self, k: Option<K>, v: &'a V) {
+    fn removed<'b>(&mut self, k: Option<&'b K>, v: &'a V) {
         self.calls.push(ChangeType::Removed(mk(&self.cursor, k), v));
     }
-    fn added(&mut self, k: Option<K>, v: &'a V) {
+    fn added<'b>(&mut self, k: Option<&'b K>, v: &'a V) {
         self.calls.push(ChangeType::Added(mk(&self.cursor, k), v));
     }
-    fn unchanged(&mut self, k: Option<K>, v: &'a V) {
+    fn unchanged<'b>(&mut self, k: Option<&'b K>, v: &'a V) {
         self.calls.push(ChangeType::Unchanged(mk(&self.cursor, k), v));
     }
-    fn modified(&mut self, k: Option<K>, v1: &'a V, v2: &'a V) {
+    fn modified<'b>(&mut self, k: Option<&'b K>, v1: &'a V, v2: &'a V) {
         self.calls.push(ChangeType::Modified(mk(&self.cursor, k), v1, v2));
     }
 }

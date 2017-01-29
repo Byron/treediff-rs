@@ -25,15 +25,15 @@ pub fn diff<'a, V, D>(l: &'a V, r: &'a V, d: &mut D)
             for k in sr.intersection(&sl) {
                 let v1 = sl.get(k).expect("intersection to work");
                 let v2 = sr.get(k).expect("intersection to work");
-                d.push(k.0.clone());
+                d.push(&k.0);
                 diff(v1.1, v2.1, d);
                 d.pop();
             }
             for k in sr.difference(&sl) {
-                d.added(Some(k.0.clone()), sr.get(k).expect("difference to work").1);
+                d.added(Some(&k.0), sr.get(k).expect("difference to work").1);
             }
             for k in sl.difference(&sr) {
-                d.removed(Some(k.0.clone()), sl.get(k).expect("difference to work").1);
+                d.removed(Some(&k.0), sl.get(k).expect("difference to work").1);
             }
         }
     }
