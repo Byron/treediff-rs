@@ -25,7 +25,9 @@ pub fn diff<'a, V, D>(l: &'a V, r: &'a V, d: &mut D)
             for k in sr.intersection(&sl) {
                 let v1 = sl.get(k).expect("intersection to work");
                 let v2 = sr.get(k).expect("intersection to work");
+                d.push(k.0.clone());
                 diff(v1.1, v2.1, d);
+                d.pop();
             }
             for k in sr.difference(&sl) {
                 d.added(Some(k.0.clone()), sr.get(k).expect("difference to work").1);
