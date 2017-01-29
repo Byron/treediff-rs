@@ -2,6 +2,7 @@ use traitdef::Value;
 use rustc_serialize::json::{Object, Json};
 use merger::Mergeable;
 use std::mem;
+use std::collections::btree_map::Entry::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd)]
 pub enum JsonKey {
@@ -49,7 +50,17 @@ impl Mergeable for Json {
                             c
                         } {
                             &mut Json::Object(ref mut obj) => {
-                                obj.entry(k.clone()).or_insert_with(|| object_or_value(i))
+                                match obj.entry(k.clone()) {
+                                    Vacant(e) => e.insert(object_or_value(i)),
+                                    Occupied(e) => {
+                                        if i == keys.len() - 1 {
+                                            *e.into_mut() = v.clone();
+                                            return;
+                                        } else {
+                                            e.into_mut()
+                                        }
+                                    }
+                                }
                             }
                             c @ &mut Json::String(_) |
                             c @ &mut Json::F64(_) |
@@ -70,6 +81,34 @@ impl Mergeable for Json {
                     }
                     _ => panic!("handle JsonKey::Index"),
                 }
+            }
+        }
+    }
+
+    fn remove(&mut self, keys: &[Self::Key]) {
+        let mut c = self;
+        for (i, k) in keys.iter().enumerate() {
+            c = match *k {
+                JsonKey::String(ref k) => {
+                    match {
+                        c
+                    } {
+                        &mut Json::Object(ref mut obj) => {
+                            if i == keys.len() - 1 {
+                                obj.remove(k);
+                                return;
+                            } else {
+                                if let Some(json) = obj.get_mut(k) {
+                                    json
+                                } else {
+                                    return;
+                                }
+                            }
+                        }
+                        _ => return,
+                    }
+                }
+                _ => panic!("handle JsonKey::Index"),
             }
         }
     }

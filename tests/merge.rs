@@ -20,6 +20,24 @@ mod merge {
     }
 
     #[test]
+    fn modified_at_root() {
+        let v1: Json = r#"{"1": 1}"#.parse().unwrap();
+        let v2: Json = r#"{"1": 2}"#.parse().unwrap();
+        let mut m = Merger::from(v1.clone());
+        diff(&v1, &v2, &mut m);
+        assert_eq!(v2, m.into_inner());
+    }
+
+    #[test]
+    fn removed_at_root() {
+        let v1: Json = r#"{"1": 1, "2": 2}"#.parse().unwrap();
+        let v2: Json = r#"{"1": 1}"#.parse().unwrap();
+        let mut m = Merger::from(v1.clone());
+        diff(&v1, &v2, &mut m);
+        assert_eq!(v2, m.into_inner());
+    }
+
+    #[test]
     fn added_at_root() {
         let v1: Json = r#"{"1": 1}"#.parse().unwrap();
         let v2: Json = r#"{"1": 1, "2": 2}"#.parse().unwrap();
