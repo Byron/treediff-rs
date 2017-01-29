@@ -4,18 +4,18 @@ use std::collections::BTreeSet;
 
 pub fn diff<'a, V, D>(l: &'a V, r: &'a V, d: &mut D)
     where V: Value<Item = V>,
-          V::Key: Ord,
-          D: Delegate<'a, V>
+          V::Key: Ord + Clone,
+          D: Delegate<'a, V::Key, V>
 {
     match (l.items(), r.items()) {
         // two scalars, equal
-        (None, None) if l == r => d.unchanged(l),
+        (None, None) if l == r => d.unchanged(None, l),
         // two scalars, different
-        (None, None) => d.modified(l, r),
+        (None, None) => d.modified(None, l, r),
         // two objects, equal
-        (Some(_), Some(_)) if l == r => d.unchanged(l),
+        (Some(_), Some(_)) if l == r => d.unchanged(None, l),
         // object and scalar
-        (Some(_), None) | (None, Some(_)) => d.modified(l, r),
+        (Some(_), None) | (None, Some(_)) => d.modified(None, l, r),
         // two objects, different
         (Some(li), Some(ri)) => {
             let mut sl: BTreeSet<OrdByKey<_, _>> = BTreeSet::new();
@@ -28,10 +28,10 @@ pub fn diff<'a, V, D>(l: &'a V, r: &'a V, d: &mut D)
                 diff(v1.1, v2.1, d);
             }
             for k in sr.difference(&sl) {
-                d.added(sr.get(k).expect("difference to work").1);
+                d.added(Some(k.0.clone()), sr.get(k).expect("difference to work").1);
             }
             for k in sl.difference(&sr) {
-                d.removed(sl.get(k).expect("difference to work").1);
+                d.removed(Some(k.0.clone()), sl.get(k).expect("difference to work").1);
             }
         }
     }

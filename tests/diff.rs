@@ -4,9 +4,13 @@ extern crate treediff;
 #[cfg(feature = "with-rustc-serialize")]
 mod diff {
     extern crate rustc_serialize;
-    use treediff::{diff, Recorder};
+    use treediff::{diff, Recorder, JsonKey};
     use self::rustc_serialize::json::Json;
     use treediff::ChangeType::*;
+
+    fn k(s: &'static str) -> JsonKey {
+        JsonKey::String(s.into())
+    }
 
     #[test]
     fn scalar_modified() {
@@ -14,7 +18,7 @@ mod diff {
         let v2: Json = r#""two""#.parse().unwrap();
         let mut d = Recorder::default();
         diff(&v1, &v2, &mut d);
-        assert_eq!(d.calls, vec![Modified(&v1, &v2)]);
+        assert_eq!(d.calls, vec![Modified(vec![], &v1, &v2)]);
     }
 
     #[test]
@@ -22,7 +26,7 @@ mod diff {
         let v: Json = r#""one""#.parse().unwrap();
         let mut d = Recorder::default();
         diff(&v, &v, &mut d);
-        assert_eq!(d.calls, vec![Unchanged(&v)]);
+        assert_eq!(d.calls, vec![Unchanged(vec![], &v)]);
     }
 
     #[test]
@@ -30,7 +34,7 @@ mod diff {
         let v: Json = r#"{"one": 1}"#.parse().unwrap();
         let mut d = Recorder::default();
         diff(&v, &v, &mut d);
-        assert_eq!(d.calls, vec![Unchanged(&v)]);
+        assert_eq!(d.calls, vec![Unchanged(vec![], &v)]);
     }
 
     #[test]
@@ -40,8 +44,9 @@ mod diff {
         let mut d = Recorder::default();
         diff(&v1, &v2, &mut d);
         assert_eq!(d.calls,
-                   vec![Unchanged(v1.as_object().unwrap().get("1").unwrap()),
-                        Modified(v1.as_object().unwrap().get("2").unwrap(),
+                   vec![Unchanged(vec![k("1")], v1.as_object().unwrap().get("1").unwrap()),
+                        Modified(vec![k("2")],
+                                 v1.as_object().unwrap().get("2").unwrap(),
                                  v2.as_object().unwrap().get("2").unwrap())]);
     }
 
@@ -52,7 +57,7 @@ mod diff {
         let mut d = Recorder::default();
         diff(&v1, &v2, &mut d);
         assert_eq!(d.calls,
-                   vec![Added(v2.as_object().unwrap().get("1").unwrap())]);
+                   vec![Added(vec![k("1")], v2.as_object().unwrap().get("1").unwrap())]);
     }
 
     #[test]
@@ -62,7 +67,7 @@ mod diff {
         let mut d = Recorder::default();
         diff(&v1, &v2, &mut d);
         assert_eq!(d.calls,
-                   vec![Removed(v1.as_object().unwrap().get("1").unwrap())]);
+                   vec![Removed(vec![k("1")], v1.as_object().unwrap().get("1").unwrap())]);
     }
 
     #[test]
@@ -71,7 +76,8 @@ mod diff {
         let v2: Json = r#"{"a": {"1": 1}}"#.parse().unwrap();
         let mut d = Recorder::default();
         diff(&v1, &v2, &mut d);
-        assert_eq!(d.calls, vec![Added(v2.find_path(&["a", "1"]).unwrap())]);
+        assert_eq!(d.calls,
+                   vec![Added(vec![k("a"), k("1")], v2.find_path(&["a", "1"]).unwrap())]);
     }
 
     #[test]
@@ -80,7 +86,8 @@ mod diff {
         let v2: Json = r#"{"a": {}}"#.parse().unwrap();
         let mut d = Recorder::default();
         diff(&v1, &v2, &mut d);
-        assert_eq!(d.calls, vec![Removed(v1.find_path(&["a", "1"]).unwrap())]);
+        assert_eq!(d.calls,
+                   vec![Removed(vec![k("a"), k("1")], v1.find_path(&["a", "1"]).unwrap())]);
     }
 
     #[test]
@@ -90,7 +97,8 @@ mod diff {
         let mut d = Recorder::default();
         diff(&v1, &v2, &mut d);
         assert_eq!(d.calls,
-                   vec![Modified(v1.find_path(&["a", "1"]).unwrap(),
+                   vec![Modified(vec![k("a"), k("1")],
+                                 v1.find_path(&["a", "1"]).unwrap(),
                                  v2.find_path(&["a", "1"]).unwrap())]);
     }
 
@@ -100,7 +108,7 @@ mod diff {
         let v2: Json = r#""1""#.parse().unwrap();
         let mut d = Recorder::default();
         diff(&v1, &v2, &mut d);
-        assert_eq!(d.calls, vec![Modified(&v1, &v2)]);
+        assert_eq!(d.calls, vec![Modified(vec![], &v1, &v2)]);
     }
 
     #[test]
@@ -109,6 +117,6 @@ mod diff {
         let v2: Json = r#"{"1": 1}"#.parse().unwrap();
         let mut d = Recorder::default();
         diff(&v1, &v2, &mut d);
-        assert_eq!(d.calls, vec![Modified(&v1, &v2)]);
+        assert_eq!(d.calls, vec![Modified(vec![], &v1, &v2)]);
     }
 }
