@@ -19,8 +19,12 @@ impl<'a, K, V> Delegate<'a, K, V> for Merger<K, V>
     where V: Mergeable<Key = K, Item = V>,
           K: Clone
 {
-    fn push<'b>(&mut self, _k: &'b K) {}
-    fn pop(&mut self) {}
+    fn push<'b>(&mut self, k: &'b K) {
+        self.cursor.push(k.clone());
+    }
+    fn pop(&mut self) {
+        self.cursor.pop();
+    }
     fn removed<'b>(&mut self, _k: Option<&'b K>, _v: &'a V) {}
     fn added<'b>(&mut self, k: Option<&'b K>, v: &'a V) {
         self.inner.set(&appended(&self.cursor, k), v);

@@ -1,6 +1,7 @@
 use traitdef::Value;
-use rustc_serialize::json::Json;
+use rustc_serialize::json::{Object, Json};
 use merger::Mergeable;
+use std::mem;
 
 #[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd)]
 pub enum JsonKey {
@@ -33,7 +34,43 @@ impl Mergeable for Json {
         if keys.len() == 0 {
             *self = v.clone();
         } else {
-            unimplemented!();
+            let mut c = self;
+            let object_or_value = |index| {
+                if index == keys.len() - 1 {
+                    v.clone()
+                } else {
+                    Json::Object(Object::new())
+                }
+            };
+            for (i, k) in keys.iter().enumerate() {
+                c = match *k {
+                    JsonKey::String(ref k) => {
+                        match {
+                            c
+                        } {
+                            &mut Json::Object(ref mut obj) => {
+                                obj.entry(k.clone()).or_insert_with(|| object_or_value(i))
+                            }
+                            c @ &mut Json::String(_) |
+                            c @ &mut Json::F64(_) |
+                            c @ &mut Json::Boolean(_) |
+                            c @ &mut Json::Null |
+                            c @ &mut Json::U64(_) |
+                            c @ &mut Json::Array(_) |
+                            c @ &mut Json::I64(_) => {
+                                mem::replace(c,
+                                             Json::Object({
+                                                 let mut o = Object::new();
+                                                 o.insert(k.clone(), object_or_value(i));
+                                                 o
+                                             }));
+                                c
+                            }
+                        }
+                    }
+                    _ => panic!("handle JsonKey::Index"),
+                }
+            }
         }
     }
 }
