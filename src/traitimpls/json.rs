@@ -1,5 +1,6 @@
 use traitdef::Value;
 use rustc_serialize::json::Json;
+use merger::Mergeable;
 
 #[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd)]
 pub enum JsonKey {
@@ -23,3 +24,5 @@ impl Value for Json {
         }
     }
 }
+
+impl Mergeable for Json {}
