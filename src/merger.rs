@@ -29,14 +29,14 @@ impl<'a, K, V> Delegate<'a, K, V> for Merger<K, V>
         self.inner.remove(&appended(&self.cursor, k));
     }
     fn added<'b>(&mut self, k: Option<&'b K>, v: &'a V) {
-        self.inner.set(&appended(&self.cursor, k), v);
+        self.inner.set(&appended(&self.cursor, k), v, None);
     }
     fn unchanged<'b>(&mut self, k: Option<&'b K>, v: &'a V) {
         assert!(k.is_none());
-        self.inner.set(&self.cursor, v)
+        self.inner.set(&self.cursor, v, None)
     }
-    fn modified<'b>(&mut self, k: Option<&'b K>, _v1: &'a V, v2: &'a V) {
-        self.inner.set(&appended(&self.cursor, k), v2);
+    fn modified<'b>(&mut self, k: Option<&'b K>, v1: &'a V, v2: &'a V) {
+        self.inner.set(&appended(&self.cursor, k), v2, Some(v1));
     }
 }
 
@@ -44,7 +44,7 @@ pub trait Mergeable {
     type Key;
     type Item;
 
-    fn set(&mut self, keys: &[Self::Key], &Self::Item);
+    fn set(&mut self, keys: &[Self::Key], new: &Self::Item, previous: Option<&Self::Item>);
     fn remove(&mut self, keys: &[Self::Key]);
 }
 

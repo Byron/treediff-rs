@@ -31,7 +31,7 @@ impl Mergeable for Json {
     type Key = JsonKey;
     type Item = Json;
 
-    fn set(&mut self, keys: &[Self::Key], v: &Self::Item) {
+    fn set(&mut self, keys: &[Self::Key], v: &Self::Item, _previous: Option<&Self::Item>) {
         if keys.len() == 0 {
             *self = v.clone();
         } else {
