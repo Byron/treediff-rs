@@ -20,10 +20,47 @@ mod merge {
     }
 
     #[test]
+    fn nested_object_in_array_modified() {
+        let v1: Json = r#"{"a": [{"1": 1}]}"#.parse().unwrap();
+        let v2: Json = r#"{"a": [{"1": 2}]}"#.parse().unwrap();
+        let mut m = Merger::from(v1.clone());
+        diff(&v1, &v2, &mut m);
+        assert_eq!(v2, m.into_inner());
+    }
+
+    #[test]
+    fn nested_object_in_array_removed() {
+        let v1: Json = r#"{"a": [{"1": 2}]}"#.parse().unwrap();
+        let v2: Json = r#"{"a": []}"#.parse().unwrap();
+        let mut m = Merger::from(v1.clone());
+        diff(&v1, &v2, &mut m);
+        assert_eq!(v2, m.into_inner());
+    }
+
+    #[test]
+    fn nested_object_in_array_added() {
+        let v1: Json = r#"{"a": []}"#.parse().unwrap();
+        let v2: Json = r#"{"a": [{"1": 2}]}"#.parse().unwrap();
+        let mut m = Merger::from(v1.clone());
+        diff(&v1, &v2, &mut m);
+        assert_eq!(v2, m.into_inner());
+    }
+
+    #[test]
     fn modified_array_at_root() {
         let v1: Json = r#"[1]"#.parse().unwrap();
         let v2: Json = r#"[2]"#.parse().unwrap();
         let mut m = Merger::from(v1.clone());
+        diff(&v1, &v2, &mut m);
+        assert_eq!(v2, m.into_inner());
+    }
+
+    #[test]
+    fn added_array_at_root_scalar_target() {
+        let v1: Json = r#"[]"#.parse().unwrap();
+        let v2: Json = r#"[1, 2]"#.parse().unwrap();
+        let t: Json = r#"null"#.parse().unwrap();
+        let mut m = Merger::from(t);
         diff(&v1, &v2, &mut m);
         assert_eq!(v2, m.into_inner());
     }

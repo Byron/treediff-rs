@@ -42,12 +42,26 @@ impl Mergeable for Json {
             } else {
                 Json::Object(Object::new())
             };
-            fn _runup_array_or_value<'a>(array: &'a mut Vec<Json>,
-                                         _key_index: usize)
-                                         -> &'a mut Json {
-                array.push(Json::Null);
-                let alen = array.len();
-                array.get_mut(alen - 1).expect("at least one item")
+            fn runup_array_or_value<'a>(array: &'a mut Vec<Json>,
+                                        target_index: usize,
+                                        key_index: usize,
+                                        last_key_index: usize,
+                                        v: &Json)
+                                        -> &'a mut Json {
+                for _ in array.len()..target_index {
+                    array.push(Json::Null);
+                }
+                let value = if key_index == last_key_index {
+                    v.clone()
+                } else {
+                    Json::Null
+                };
+                if target_index == array.len() {
+                    array.push(value);
+                } else {
+                    array[target_index] = value;
+                }
+                &mut array[target_index]
             };
             for (i, k) in keys.iter().enumerate() {
                 c = match *k {
@@ -93,32 +107,40 @@ impl Mergeable for Json {
                             }
                         }
                     }
-                    _ => unimplemented!(),
+                    JsonKey::Index(idx) => {
+                        match {
+                            c
+                        } {
+                            &mut Json::Array(ref mut a) => {
+                                runup_array_or_value(a, idx, i, last_key_index, v)
+                            }
+                            c @ &mut Json::String(_) |
+                            c @ &mut Json::F64(_) |
+                            c @ &mut Json::Boolean(_) |
+                            c @ &mut Json::Null |
+                            c @ &mut Json::U64(_) |
+                            c @ &mut Json::Object(_) |
+                            c @ &mut Json::I64(_) => {
+                                let mut a = Vec::new();
+                                runup_array_or_value(&mut a, idx, i, last_key_index, v);
+                                mem::replace(c, Json::Array(a));
+                                if i == last_key_index {
+                                    return;
+                                }
+                                match c {
+                                    &mut Json::Array(ref mut a) => {
+                                        a.get_mut(idx).expect("previous insertion")
+                                    }
+                                    _ => unreachable!(),
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
     }
 
-
-    //    JsonKey::Index(idx) => {
-    //match {
-    //c
-    //} {
-    //&mut Json::Array(ref mut a) => runup_array_or_value(a, i),
-    //&mut Json::String(_) |
-    //&mut Json::F64(_) |
-    //&mut Json::Boolean(_) |
-    //&mut Json::Null |
-    //&mut Json::U64(_) |
-    //&mut Json::Object(_) |
-    //&mut Json::I64(_) => {
-    //let mut a = Vec::new();
-    //runup_array_or_value(&mut a, i);
-    //mem::replace(c, Json::Array(a));
-    //c
-    //}
-    //}
-    //}
 
     fn remove(&mut self, keys: &[Self::Key]) {
         let mut c = self;
