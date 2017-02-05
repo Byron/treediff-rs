@@ -3,7 +3,7 @@ extern crate treediff;
 macro_rules! make_suite {
 ($bool:expr) => {
     use treediff::Value;
-    use treediff::value::json::JsonKey;
+    use treediff::value::Key;
 
     fn make(v: &str) -> Json {
         v.parse().unwrap()
@@ -21,16 +21,16 @@ macro_rules! make_suite {
     fn array() {
         let j = make(r#"[null, true]"#);
         assert_eq!(j.items().unwrap().collect::<Vec<_>>(),
-                   vec![(JsonKey::Index(0), &Json::Null),
-                        (JsonKey::Index(1), &$bool(true))]);
+                   vec![(Key::Index(0), &Json::Null),
+                        (Key::Index(1), &$bool(true))]);
     }
 
     #[test]
     fn object() {
         let j = make(r#"{"a": null, "b": true}"#);
         assert_eq!(j.items().unwrap().collect::<Vec<_>>(),
-                   vec![(JsonKey::String("a".into()), &Json::Null),
-                        (JsonKey::String("b".into()), &$bool(true))]);
+                   vec![(Key::String("a".into()), &Json::Null),
+                        (Key::String("b".into()), &$bool(true))]);
     }
 
     #[test]

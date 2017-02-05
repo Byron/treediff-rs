@@ -7,11 +7,11 @@ mod diff {
     use treediff::diff;
     use treediff::record::Recorder;
     use treediff::record::ChangeType::*;
-    use treediff::value::json::JsonKey;
+    use treediff::value::Key;
     use self::rustc_serialize::json::Json;
 
-    fn k(s: &'static str) -> JsonKey {
-        JsonKey::String(s.into())
+    fn k(s: &'static str) -> Key {
+        Key::String(s.into())
     }
 
     #[test]

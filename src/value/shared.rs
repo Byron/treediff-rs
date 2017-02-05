@@ -1,5 +1,5 @@
 #[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd)]
-pub enum JsonKey {
+pub enum Key {
     Index(usize),
     String(String),
 }
