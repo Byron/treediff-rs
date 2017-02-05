@@ -1,7 +1,6 @@
-use traitdef::Value;
+use traitdef::{Mutable, Value};
 use super::Key;
 use serde_json::{Map, Value as SerdeJson};
-use merge::Mergeable;
 use std::mem;
 
 impl Value for SerdeJson {
@@ -23,7 +22,7 @@ impl Value for SerdeJson {
     }
 }
 
-impl Mergeable for SerdeJson {
+impl Mutable for SerdeJson {
     type Key = Key;
     type Item = SerdeJson;
 

@@ -1,9 +1,9 @@
 /// Represents a scalar value or an associative array.
 pub trait Value: PartialEq<Self> {
-    /// The Value type itself.
-    type Item;
     /// The Key type used to find Values in a mapping.
     type Key;
+    /// The Value type itself.
+    type Item;
     /// Returns `None` if this is a scalar value, and an iterator yielding (Key, Value) pairs
     /// otherwise. It is entirely possible for it to yield no values though.
     fn items<'a>(&'a self) -> Option<Box<Iterator<Item = (Self::Key, &'a Self::Item)> + 'a>>;
@@ -39,4 +39,24 @@ pub trait Delegate<'a, K, V> {
 
     /// ... the `old` Value was modified, and is now the `new` Value.
     fn modified<'b>(&mut self, _old: &'a V, _new: &'a V) {}
+}
+
+/// A trait to allow changing any `Value`.
+pub trait Mutable {
+    /// The Key type used to find Values in a mapping.
+    type Key;
+    /// The Value type itself.
+    type Item;
+
+    /// Set the `new` Value at the path identified by `keys`.
+    ///
+    /// Intermediate container values (like HashMaps, Arrays) must be created until
+    /// the last Key in `keys` can be modified or inserted with `new`.
+    fn set(&mut self, keys: &[Self::Key], new: &Self::Item);
+
+    /// Remove the value located at the path identified by `keys`.
+    ///
+    /// If the value does not exist, just return. Intermediate container values
+    /// must not be created.
+    fn remove(&mut self, keys: &[Self::Key]);
 }

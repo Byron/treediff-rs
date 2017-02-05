@@ -1,6 +1,5 @@
-use traitdef::Value;
+use traitdef::{Mutable, Value};
 use rustc_serialize::json::{Object, Json as RustcJson};
-use merge::Mergeable;
 use std::mem;
 use std::collections::btree_map::Entry::*;
 use super::Key;
@@ -26,7 +25,7 @@ impl Value for RustcJson {
     }
 }
 
-impl Mergeable for RustcJson {
+impl Mutable for RustcJson {
     type Key = Key;
     type Item = RustcJson;
 

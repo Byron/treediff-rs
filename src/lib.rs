@@ -6,7 +6,7 @@
 //! It can work with all values implementing the `Value` trait.
 //!
 //! On top of it there is a [merge implementation][merge], which can be used to aggregate changes
-//! into a target value. It works with `Value`s which implement the `Mergeable` trait.
+//! into a target value. It works with `Value`s which implement the `Mutable` trait.
 //!
 //! # Usage
 //! Please have a look at the tests for [diff][diff-tests] and [merge][merge-tests] tests.
