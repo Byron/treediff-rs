@@ -1,7 +1,7 @@
 extern crate treediff;
 
 macro_rules! make_suite {
-($null:expr, $bool:expr) => {
+($bool:expr) => {
     use treediff::Value;
     use treediff::value::json::JsonKey;
 
@@ -21,7 +21,7 @@ macro_rules! make_suite {
     fn array() {
         let j = make(r#"[null, true]"#);
         assert_eq!(j.items().unwrap().collect::<Vec<_>>(),
-                   vec![(JsonKey::Index(0), &$null),
+                   vec![(JsonKey::Index(0), &Json::Null),
                         (JsonKey::Index(1), &$bool(true))]);
     }
 
@@ -29,7 +29,7 @@ macro_rules! make_suite {
     fn object() {
         let j = make(r#"{"a": null, "b": true}"#);
         assert_eq!(j.items().unwrap().collect::<Vec<_>>(),
-                   vec![(JsonKey::String("a".into()), &$null),
+                   vec![(JsonKey::String("a".into()), &Json::Null),
                         (JsonKey::String("b".into()), &$bool(true))]);
     }
 
@@ -47,7 +47,7 @@ mod serde_json {
     extern crate serde_json;
     use self::serde_json::Value as Json;
 
-    make_suite!(Json::Null, Json::Bool);
+    make_suite!(Json::Bool);
 }
 
 #[cfg(feature = "with-rustc-serialize")]
@@ -55,5 +55,5 @@ mod rustc_serialize {
     extern crate rustc_serialize;
     use self::rustc_serialize::json::Json;
 
-    make_suite!(Json::Null, Json::Boolean);
+    make_suite!(Json::Boolean);
 }
