@@ -30,21 +30,21 @@ impl<'a, K, V, C, R> Delegate<'a, K, V> for Merger<K, V, C, R>
     fn pop(&mut self) {
         self.cursor.pop();
     }
-    fn removed<'b>(&mut self, k: Option<&'b K>, v: &'a V) {
-        let keys = appended(&self.cursor, k);
+    fn removed<'b>(&mut self, k: &'b K, v: &'a V) {
+        let keys = appended(&self.cursor, Some(k));
         match (self.handle_removal)(&keys, v, &mut self.inner) {
             Some(nv) => self.inner.set(&keys, &nv),
             None => self.inner.remove(&keys),
         }
     }
-    fn added<'b>(&mut self, k: Option<&'b K>, v: &'a V) {
-        self.inner.set(&appended(&self.cursor, k), v);
+    fn added<'b>(&mut self, k: &'b K, v: &'a V) {
+        self.inner.set(&appended(&self.cursor, Some(k)), v);
     }
     fn unchanged<'b>(&mut self, v: &'a V) {
         self.inner.set(&self.cursor, v)
     }
-    fn modified<'b>(&mut self, k: Option<&'b K>, prev: &'a V, new: &'a V) {
-        let keys = appended(&self.cursor, k);
+    fn modified<'b>(&mut self, prev: &'a V, new: &'a V) {
+        let keys = appended(&self.cursor, None);
         match (self.resolve_conflict)(prev, new, &mut self.inner) {
             Some(v) => self.inner.set(&keys, &v),
             None => self.inner.remove(&keys),

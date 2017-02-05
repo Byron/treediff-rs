@@ -18,14 +18,15 @@ pub trait Value: PartialEq<Self> {
 /// Methods will be called if...
 pub trait Delegate<'a, K, V> {
     /// ... we recurse into the `Value` at the given `Key`
+    ///
+    /// Delegates should memoize the current Key path to be able to compute
+    /// the full Key path when needed.
     fn push<'b>(&mut self, _k: &'b K) {}
     /// ... we have processed all items and leave the object previously `push`ed.
     fn pop(&mut self) {}
-    /// ... the Value `v` at the given Key path `k` should be removed.
-    ///
-    /// If `k` is `None`
-    fn removed<'b>(&mut self, _k: Option<&'b K>, _v: &'a V) {}
-    fn added<'b>(&mut self, _k: Option<&'b K>, _v: &'a V) {}
+    /// ... the Value `v` at the given Key `k` should be removed.
+    fn removed<'b>(&mut self, _k: &'b K, _v: &'a V) {}
+    fn added<'b>(&mut self, _k: &'b K, _v: &'a V) {}
     fn unchanged<'b>(&mut self, _v: &'a V) {}
-    fn modified<'b>(&mut self, _k: Option<&'b K>, _v1: &'a V, _v2: &'a V) {}
+    fn modified<'b>(&mut self, _v1: &'a V, _v2: &'a V) {}
 }

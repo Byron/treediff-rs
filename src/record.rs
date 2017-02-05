@@ -45,16 +45,16 @@ impl<'a, K, V> Delegate<'a, K, V> for Recorder<'a, K, V>
     fn pop(&mut self) {
         self.cursor.pop();
     }
-    fn removed<'b>(&mut self, k: Option<&'b K>, v: &'a V) {
-        self.calls.push(ChangeType::Removed(mk(&self.cursor, k), v));
+    fn removed<'b>(&mut self, k: &'b K, v: &'a V) {
+        self.calls.push(ChangeType::Removed(mk(&self.cursor, Some(k)), v));
     }
-    fn added<'b>(&mut self, k: Option<&'b K>, v: &'a V) {
-        self.calls.push(ChangeType::Added(mk(&self.cursor, k), v));
+    fn added<'b>(&mut self, k: &'b K, v: &'a V) {
+        self.calls.push(ChangeType::Added(mk(&self.cursor, Some(k)), v));
     }
     fn unchanged<'b>(&mut self, v: &'a V) {
         self.calls.push(ChangeType::Unchanged(self.cursor.clone(), v));
     }
-    fn modified<'b>(&mut self, k: Option<&'b K>, v1: &'a V, v2: &'a V) {
-        self.calls.push(ChangeType::Modified(mk(&self.cursor, k), v1, v2));
+    fn modified<'b>(&mut self, v1: &'a V, v2: &'a V) {
+        self.calls.push(ChangeType::Modified(mk(&self.cursor, None), v1, v2));
     }
 }
