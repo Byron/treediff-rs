@@ -2,7 +2,7 @@ extern crate treediff;
 
 macro_rules! make_suite {
 ($json:tt, $mkscalar:ident, $mkobject:ident) => {
-    use treediff::{diff, Merger};
+    use treediff::{diff, Merger, pick_new, pick_old, drop_removed};
     use std::borrow::Cow;
 
     #[test]
@@ -74,13 +74,9 @@ macro_rules! make_suite {
     }
     #[test]
     fn modified_at_root_with_resolver() {
-        fn pick<'a, V: Clone>(old: Cow<'a, V>, _new: Cow<'a, V>) -> Cow<'a, V> {
-            old
-        }
-
         let v1 = r#"{"1": 1}"#.parse().unwrap();
         let v2 = r#"{"1": 2}"#.parse().unwrap();
-        let mut m = Merger::with_resolver($json::clone(&v2), pick);
+        let mut m = Merger::with_resolver($json::clone(&v2), pick_old, drop_removed);
         diff(&v1, &v2, &mut m);
         assert_eq!(v1, m.into_inner());
     }
@@ -92,6 +88,20 @@ macro_rules! make_suite {
         let mut m = Merger::from($json::clone(&v1));
         diff(&v1, &v2, &mut m);
         assert_eq!(v2, m.into_inner());
+    }
+
+    #[test]
+    fn removed_at_root_with_resolver() {
+        pub fn incr<'a, K, V: Clone>(_keys: &[K], removed: Cow<'a, V>)
+                -> Option<Cow<'a, V>>
+        {
+            Some(removed)
+        }
+        let v1 = r#"{"1": 1, "2": 2}"#.parse().unwrap();
+        let v2 = r#"{"1": 1}"#.parse().unwrap();
+        let mut m = Merger::with_resolver($json::clone(&v1), pick_new, incr);
+        diff(&v1, &v2, &mut m);
+        assert_eq!(v1, m.into_inner());
     }
 
     #[test]
