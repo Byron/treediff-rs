@@ -1,11 +1,17 @@
 extern crate treediff;
 
+macro_rules! make_suite {
+($null:expr, $bool:expr) => {
+}
+}
 
 #[cfg(feature = "with-rustc-serialize")]
 mod merge {
     extern crate rustc_serialize;
     use self::rustc_serialize::json::{Object, Json};
     use treediff::{diff, Merger};
+
+    //    make_suite!();
 
     #[test]
     fn unchanged_at_root() {
