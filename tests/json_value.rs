@@ -1,11 +1,21 @@
 extern crate treediff;
 
+macro_rules! make_suite {
+    ($module:ident) => {
+    mod $module {
+
+    }
+    };
+}
+
 #[cfg(feature = "with-rustc-serialize")]
 mod rustc_json_value {
     extern crate rustc_serialize;
     use treediff::Value;
-    use treediff::JsonKey;
+    use treediff::value::json::rustc_serialize::JsonKey;
     use self::rustc_serialize::json::Json;
+
+    make_suite!(rustc_value);
 
     #[test]
     fn scalar_values() {

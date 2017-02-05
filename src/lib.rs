@@ -4,13 +4,12 @@ extern crate rustc_serialize;
 
 
 mod traitdef;
-mod traitimpls;
 mod diff;
 mod recorder;
 mod merger;
+pub mod value;
 
 pub use traitdef::*;
-pub use traitimpls::*;
 pub use diff::*;
 pub use recorder::*;
 pub use merger::*;
