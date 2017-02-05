@@ -5,7 +5,7 @@ extern crate treediff;
 mod diff {
     extern crate rustc_serialize;
     use treediff::{diff, Recorder};
-    use treediff::value::json::rustc_serialize::JsonKey;
+    use treediff::value::json::JsonKey;
     use self::rustc_serialize::json::Json;
     use treediff::ChangeType::*;
 

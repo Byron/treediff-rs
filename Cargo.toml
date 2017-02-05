@@ -10,7 +10,9 @@ version = "0.1.0"
 
 [dependencies]
 rustc-serialize = {version = "0.3.22", optional = true}
+serde_json = {version = "0.9", optional = true}
 
 [features]
 with-rustc-serialize = ["rustc-serialize"]
+with-serde-json = ["serde_json"]
 

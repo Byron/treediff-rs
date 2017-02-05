@@ -3,12 +3,7 @@ use rustc_serialize::json::{Object, Json};
 use merger::Mergeable;
 use std::mem;
 use std::collections::btree_map::Entry::*;
-
-#[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd)]
-pub enum JsonKey {
-    Index(usize),
-    String(String),
-}
+use super::JsonKey;
 
 impl Value for Json {
     type Item = Json;

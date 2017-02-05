@@ -1,7 +1,10 @@
 extern crate treediff;
 
 macro_rules! make_suite {
-    ($make:ident, $index:tt, $null:expr, $bool:expr) => {
+    ($make:ident, $null:expr, $bool:expr) => {
+        use treediff::Value;
+        use treediff::value::json::JsonKey;
+
         #[test]
         fn scalar_values() {
             for v in &["null", "true", "1.23", "-1234456", "1234456", "\"string\""] {
@@ -14,16 +17,16 @@ macro_rules! make_suite {
         fn array() {
             let j = $make(r#"[null, true]"#);
             assert_eq!(j.items().unwrap().collect::<Vec<_>>(),
-                       vec![($index::Index(0), &$null),
-                            ($index::Index(1), &$bool(true))]);
+                       vec![(JsonKey::Index(0), &$null),
+                            (JsonKey::Index(1), &$bool(true))]);
         }
 
         #[test]
         fn object() {
             let j = $make(r#"{"a": null, "b": true}"#);
             assert_eq!(j.items().unwrap().collect::<Vec<_>>(),
-                       vec![($index::String("a".into()), &$null),
-                            ($index::String("b".into()), &$bool(true))]);
+                       vec![(JsonKey::String("a".into()), &$null),
+                            (JsonKey::String("b".into()), &$bool(true))]);
         }
 
         #[test]
@@ -35,18 +38,26 @@ macro_rules! make_suite {
 }
 
 
-#[cfg(feature = "with-rustc-serialize")]
-mod rustc_serialize {
-    extern crate rustc_serialize;
-    use treediff::value::json::rustc_serialize::JsonKey;
-    use self::rustc_serialize::json::Json;
-    use treediff::Value;
+#[cfg(feature = "with-serde-json")]
+mod serde_json {
+    extern crate serde_json;
+    use self::serde_json::Value as Json;
 
     fn make_json(v: &str) -> Json {
         v.parse().unwrap()
     }
 
-    make_suite!(make_json, JsonKey, Json::Null, Json::Boolean);
+    make_suite!(make_json, Json::Null, Json::Bool);
+}
 
+#[cfg(feature = "with-rustc-serialize")]
+mod rustc_serialize {
+    extern crate rustc_serialize;
+    use self::rustc_serialize::json::Json;
 
+    fn make_json(v: &str) -> Json {
+        v.parse().unwrap()
+    }
+
+    make_suite!(make_json, Json::Null, Json::Boolean);
 }
