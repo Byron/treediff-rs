@@ -3,6 +3,7 @@ extern crate treediff;
 macro_rules! make_suite {
 ($json:tt, $mkscalar:ident, $mkobject:ident) => {
     use treediff::{diff, Merger};
+    use std::borrow::Cow;
 
     #[test]
     fn unchanged_at_root_() {
@@ -70,6 +71,18 @@ macro_rules! make_suite {
         let mut m = Merger::from(t);
         diff(&v1, &v2, &mut m);
         assert_eq!(v2, m.into_inner());
+    }
+    #[test]
+    fn modified_at_root_with_resolver() {
+        fn pick<'a, V: Clone>(old: Cow<'a, V>, _new: Cow<'a, V>) -> Cow<'a, V> {
+            old
+        }
+
+        let v1 = r#"{"1": 1}"#.parse().unwrap();
+        let v2 = r#"{"1": 2}"#.parse().unwrap();
+        let mut m = Merger::with_resolver($json::clone(&v2), pick);
+        diff(&v1, &v2, &mut m);
+        assert_eq!(v1, m.into_inner());
     }
 
     #[test]

@@ -61,6 +61,18 @@ fn pick_new_value<'a, V: Clone>(_old: Cow<'a, V>, new: Cow<'a, V>) -> Cow<'a, V>
     new
 }
 
+impl<'a, M, F> Merger<M::Key, M, F>
+    where M: Mergeable + 'a + Clone,
+          F: Fn(Cow<'a, M>, Cow<'a, M>) -> Cow<'a, M>
+{
+    pub fn with_resolver(v: M, f: F) -> Self {
+        Merger {
+            inner: v,
+            cursor: Vec::new(),
+            resolve: f,
+        }
+    }
+}
 
 impl<'a, M> From<M> for Merger<M::Key, M, fn(Cow<'a, M>, Cow<'a, M>) -> Cow<'a, M>>
     where M: Mergeable + 'a + Clone
