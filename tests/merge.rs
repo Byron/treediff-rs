@@ -5,6 +5,14 @@ macro_rules! make_suite {
     use treediff::{diff, Merger, pick_new, pick_old, drop_removed};
     use std::borrow::Cow;
 
+    fn make_object() -> Json {
+        $json::Object(Object::new())
+    }
+
+    fn make_scalar() -> Json {
+        $json::Null
+    }
+
     #[test]
     fn unchanged_at_root_() {
         for s in &[r#"{"1": 1, "2": {"1" : 1}}"#, r#"-1"#, r#"1"#, r#""str""#] {
@@ -125,17 +133,17 @@ macro_rules! make_suite {
 }
 
 #[cfg(feature = "with-rustc-serialize")]
-mod merge {
+mod serde_json {
+    extern crate serde_json;
+    use self::serde_json::{Map as Object, Value as Json};
+
+    make_suite!(Json, make_scalar, make_object);
+}
+
+#[cfg(feature = "with-rustc-serialize")]
+mod rustc_serialize {
     extern crate rustc_serialize;
     use self::rustc_serialize::json::{Object, Json};
-
-    fn make_scalar() -> Json {
-        Json::Null
-    }
-
-    fn make_object() -> Json {
-        Json::Object(Object::new())
-    }
 
     make_suite!(Json, make_scalar, make_object);
 }
