@@ -92,7 +92,7 @@ macro_rules! make_suite {
 
     #[test]
     fn removed_at_root_with_resolver() {
-        pub fn incr<'a, K, V: Clone>(_keys: &[K], removed: &'a V)
+        pub fn incr<'a, K, V: Clone>(_keys: &[K], removed: &'a V, _self: &mut V)
                 -> Option<Cow<'a, V>>
         {
             Some(Cow::Borrowed(removed))
