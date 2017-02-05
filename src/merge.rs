@@ -21,7 +21,7 @@ fn appended<'b, K>(keys: &Vec<K>, k: Option<&'b K>) -> Vec<K>
 impl<'a, K, V, C, R> Delegate<'a, K, V> for Merger<K, V, C, R>
     where V: Mergeable<Key = K, Item = V> + Clone + 'a,
           K: Clone,
-          C: Fn(&'a V, &'a V, &mut V) -> Cow<'a, V>,
+          C: Fn(&'a V, &'a V, &mut V) -> Option<Cow<'a, V>>,
           R: Fn(&[K], &'a V, &mut V) -> Option<Cow<'a, V>>
 {
     fn push<'b>(&mut self, k: &'b K) {
@@ -44,8 +44,11 @@ impl<'a, K, V, C, R> Delegate<'a, K, V> for Merger<K, V, C, R>
         self.inner.set(&self.cursor, v)
     }
     fn modified<'b>(&mut self, k: Option<&'b K>, prev: &'a V, new: &'a V) {
-        let v = (self.resolve_conflict)(prev, new, &mut self.inner);
-        self.inner.set(&appended(&self.cursor, k), &v);
+        let keys = appended(&self.cursor, k);
+        match (self.resolve_conflict)(prev, new, &mut self.inner) {
+            Some(v) => self.inner.set(&keys, &v),
+            None => self.inner.remove(&keys),
+        }
     }
 }
 
@@ -63,12 +66,16 @@ impl<K, V, C, R> Merger<K, V, C, R> {
     }
 }
 
-pub fn pick_new<'a, V: Clone>(_old: &'a V, new: &'a V, _self: &mut V) -> Cow<'a, V> {
-    Cow::Borrowed(new)
+pub fn pick_new<'a, V: Clone>(_old: &'a V, new: &'a V, _self: &mut V) -> Option<Cow<'a, V>> {
+    Some(Cow::Borrowed(new))
 }
 
-pub fn pick_old<'a, V: Clone>(old: &'a V, _new: &'a V, _self: &mut V) -> Cow<'a, V> {
-    Cow::Borrowed(old)
+pub fn pick_old<'a, V: Clone>(old: &'a V, _new: &'a V, _self: &mut V) -> Option<Cow<'a, V>> {
+    Some(Cow::Borrowed(old))
+}
+
+pub fn pick_none<'a, V: Clone>(_old: &'a V, _new: &'a V, _self: &mut V) -> Option<Cow<'a, V>> {
+    None
 }
 
 pub fn drop_removed<'a, K, V: Clone>(_keys: &[K],
@@ -81,7 +88,7 @@ pub fn drop_removed<'a, K, V: Clone>(_keys: &[K],
 
 impl<'a, V, C, R> Merger<V::Key, V, C, R>
     where V: Mergeable + 'a + Clone,
-          C: Fn(&'a V, &'a V, &mut V) -> Cow<'a, V>,
+          C: Fn(&'a V, &'a V, &mut V) -> Option<Cow<'a, V>>,
           R: Fn(&[V::Key], &'a V, &mut V) -> Option<Cow<'a, V>>
 {
     pub fn with_resolver(v: V, c: C, r: R) -> Self {
@@ -97,7 +104,7 @@ impl<'a, V, C, R> Merger<V::Key, V, C, R>
 impl<'a, V> From<V>
     for Merger<V::Key,
                                    V,
-                                   fn(&'a V, &'a V, &mut V) -> Cow<'a, V>,
+                                   fn(&'a V, &'a V, &mut V) -> Option<Cow<'a, V>>,
                                    fn(&[V::Key], &'a V, &mut V) -> Option<Cow<'a, V>>>
     where V: Mergeable + 'a + Clone
 {
@@ -105,7 +112,7 @@ impl<'a, V> From<V>
         Merger {
             inner: v,
             cursor: Vec::new(),
-            resolve_conflict: pick_new::<V> as fn(&'a V, &'a V, &mut V) -> Cow<'a, V>,
+            resolve_conflict: pick_new::<V> as fn(&'a V, &'a V, &mut V) -> Option<Cow<'a, V>>,
             handle_removal: drop_removed::<V::Key, V> as
                             fn(&[V::Key], &'a V, &mut V) -> Option<Cow<'a, V>>,
         }

@@ -3,7 +3,7 @@ extern crate treediff;
 macro_rules! make_suite {
 () => {
     use treediff::diff;
-    use treediff::merge::{Merger, pick_new, pick_old, drop_removed};
+    use treediff::merge::{Merger, pick_none, pick_new, pick_old, drop_removed};
     use std::borrow::Cow;
 
     fn make_object() -> Json {
@@ -81,8 +81,19 @@ macro_rules! make_suite {
         diff(&v1, &v2, &mut m);
         assert_eq!(v2, m.into_inner());
     }
+
     #[test]
-    fn modified_at_root_with_resolver() {
+    fn modified_at_root_with_resolver_pick_none() {
+        let v1 = r#"{"1": 1}"#.parse().unwrap();
+        let v2 = r#"{"1": 2}"#.parse().unwrap();
+        let v3: Json = r#"{}"#.parse().unwrap();
+        let mut m = Merger::with_resolver(Json::clone(&v2), pick_none, drop_removed);
+        diff(&v1, &v2, &mut m);
+        assert_eq!(v3, m.into_inner());
+    }
+
+    #[test]
+    fn modified_at_root_with_resolver_pick_old() {
         let v1 = r#"{"1": 1}"#.parse().unwrap();
         let v2 = r#"{"1": 2}"#.parse().unwrap();
         let mut m = Merger::with_resolver(Json::clone(&v2), pick_old, drop_removed);
