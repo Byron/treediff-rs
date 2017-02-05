@@ -2,6 +2,16 @@ use traitdef::{Value, Delegate};
 use std::cmp::Ordering;
 use std::collections::BTreeSet;
 
+/// A generic diff algorithm suitable for `Value` types as seen in serialization/deserialization
+/// libraries.
+///
+/// Such types can represent any tree-like data structure, which will be traversed to find
+/// *additions*, *removals*, *modifications* and even portions that did not change at all.
+///
+/// # Parameters
+/// * `l` - the left Value
+/// * `r` - the right Value
+/// * `d` - a `Delegate` to receive information about changes between `l` and `r`
 pub fn diff<'a, V, D>(l: &'a V, r: &'a V, d: &mut D)
     where V: Value<Item = V>,
           V::Key: Ord + Clone,

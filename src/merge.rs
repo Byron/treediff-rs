@@ -43,9 +43,9 @@ impl<'a, K, V, C, R> Delegate<'a, K, V> for Merger<K, V, C, R>
     fn unchanged<'b>(&mut self, v: &'a V) {
         self.inner.set(&self.cursor, v)
     }
-    fn modified<'b>(&mut self, prev: &'a V, new: &'a V) {
+    fn modified<'b>(&mut self, old: &'a V, new: &'a V) {
         let keys = appended(&self.cursor, None);
-        match (self.resolve_conflict)(prev, new, &mut self.inner) {
+        match (self.resolve_conflict)(old, new, &mut self.inner) {
             Some(v) => self.inner.set(&keys, &v),
             None => self.inner.remove(&keys),
         }
