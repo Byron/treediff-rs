@@ -144,6 +144,7 @@ impl Mergeable for Json {
 
     fn remove(&mut self, keys: &[Self::Key]) {
         let mut c = self;
+        let last_key_index = keys.len() - 1;
         for (i, k) in keys.iter().enumerate() {
             c = match *k {
                 JsonKey::String(ref k) => {
@@ -151,21 +152,37 @@ impl Mergeable for Json {
                         c
                     } {
                         &mut Json::Object(ref mut obj) => {
-                            if i == keys.len() - 1 {
+                            if i == last_key_index {
                                 obj.remove(k);
                                 return;
                             } else {
-                                if let Some(json) = obj.get_mut(k) {
-                                    json
-                                } else {
-                                    return;
+                                match obj.get_mut(k) {
+                                    Some(json) => json,
+                                    None => return,
                                 }
                             }
                         }
                         _ => return,
                     }
                 }
-                _ => panic!("handle JsonKey::Index"),
+                JsonKey::Index(idx) => {
+                    match {
+                        c
+                    } {
+                        &mut Json::Array(ref mut a) => {
+                            if i == last_key_index {
+                                a.remove(idx);
+                                return;
+                            } else {
+                                match a.get_mut(idx) {
+                                    Some(json) => json,
+                                    None => return,
+                                }
+                            }
+                        }
+                        _ => return,
+                    }
+                }
             }
         }
     }
