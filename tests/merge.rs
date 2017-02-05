@@ -92,10 +92,10 @@ macro_rules! make_suite {
 
     #[test]
     fn removed_at_root_with_resolver() {
-        pub fn incr<'a, K, V: Clone>(_keys: &[K], removed: Cow<'a, V>)
+        pub fn incr<'a, K, V: Clone>(_keys: &[K], removed: &'a V)
                 -> Option<Cow<'a, V>>
         {
-            Some(removed)
+            Some(Cow::Borrowed(removed))
         }
         let v1 = r#"{"1": 1, "2": 2}"#.parse().unwrap();
         let v2 = r#"{"1": 1}"#.parse().unwrap();
