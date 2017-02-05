@@ -1,6 +1,6 @@
 use traitdef::Delegate;
 
-/// Identifies a type of change at a given Key path.
+/// Identifies a type of change at a given Key path, for use with the `Recorder`.
 ///
 /// The Key path is followed to know what happened with the Value `V` contained in the variants.
 #[derive(Debug, PartialEq)]
