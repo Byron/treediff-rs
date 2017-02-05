@@ -51,8 +51,8 @@ impl<'a, K, V> Delegate<'a, K, V> for Recorder<'a, K, V>
     fn added<'b>(&mut self, k: Option<&'b K>, v: &'a V) {
         self.calls.push(ChangeType::Added(mk(&self.cursor, k), v));
     }
-    fn unchanged<'b>(&mut self, k: Option<&'b K>, v: &'a V) {
-        self.calls.push(ChangeType::Unchanged(mk(&self.cursor, k), v));
+    fn unchanged<'b>(&mut self, v: &'a V) {
+        self.calls.push(ChangeType::Unchanged(self.cursor.clone(), v));
     }
     fn modified<'b>(&mut self, k: Option<&'b K>, v1: &'a V, v2: &'a V) {
         self.calls.push(ChangeType::Modified(mk(&self.cursor, k), v1, v2));

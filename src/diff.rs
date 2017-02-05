@@ -9,11 +9,11 @@ pub fn diff<'a, V, D>(l: &'a V, r: &'a V, d: &mut D)
 {
     match (l.items(), r.items()) {
         // two scalars, equal
-        (None, None) if l == r => d.unchanged(None, l),
+        (None, None) if l == r => d.unchanged(l),
         // two scalars, different
         (None, None) => d.modified(None, l, r),
         // two objects, equal
-        (Some(_), Some(_)) if l == r => d.unchanged(None, l),
+        (Some(_), Some(_)) if l == r => d.unchanged(l),
         // object and scalar
         (Some(_), None) | (None, Some(_)) => d.modified(None, l, r),
         // two objects, different

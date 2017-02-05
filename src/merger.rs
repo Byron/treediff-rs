@@ -33,8 +33,7 @@ impl<'a, K, V, R> Delegate<'a, K, V> for Merger<K, V, R>
     fn added<'b>(&mut self, k: Option<&'b K>, v: &'a V) {
         self.inner.set(&appended(&self.cursor, k), v, None);
     }
-    fn unchanged<'b>(&mut self, k: Option<&'b K>, v: &'a V) {
-        assert!(k.is_none());
+    fn unchanged<'b>(&mut self, v: &'a V) {
         self.inner.set(&self.cursor, v, None)
     }
     fn modified<'b>(&mut self, k: Option<&'b K>, v1: &'a V, v2: &'a V) {
