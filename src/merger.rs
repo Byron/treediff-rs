@@ -1,8 +1,9 @@
 use traitdef::Delegate;
 
-pub struct Merger<K, V> {
+pub struct Merger<K, V, R> {
     cursor: Vec<K>,
     inner: V,
+    resolve: R,
 }
 
 fn appended<'b, K>(keys: &Vec<K>, k: Option<&'b K>) -> Vec<K>
@@ -15,9 +16,10 @@ fn appended<'b, K>(keys: &Vec<K>, k: Option<&'b K>) -> Vec<K>
     keys
 }
 
-impl<'a, K, V> Delegate<'a, K, V> for Merger<K, V>
-    where V: Mergeable<Key = K, Item = V>,
-          K: Clone
+impl<'a, K, V, R> Delegate<'a, K, V> for Merger<K, V, R>
+    where V: Mergeable<Key = K, Item = V> + 'a,
+          K: Clone,
+          R: Fn(&'a V, &'a V) -> &'a V
 {
     fn push<'b>(&mut self, k: &'b K) {
         self.cursor.push(k.clone());
@@ -48,19 +50,24 @@ pub trait Mergeable {
     fn remove(&mut self, keys: &[Self::Key]);
 }
 
-impl<K, V> Merger<K, V> {
+impl<K, V, R> Merger<K, V, R> {
     pub fn into_inner(self) -> V {
         self.inner
     }
 }
 
-impl<M> From<M> for Merger<M::Key, M>
-    where M: Mergeable
+fn pick_new_value<'a, V>(prev: &'a V, new: &'a V) -> &'a V {
+    new
+}
+
+impl<'a, M> From<M> for Merger<M::Key, M, fn(&'a M, &'a M) -> &'a M>
+    where M: Mergeable + 'a
 {
     fn from(v: M) -> Self {
         Merger {
             inner: v,
             cursor: Vec::new(),
+            resolve: pick_new_value::<M> as fn(&'a M, &'a M) -> &'a M,
         }
     }
 }
