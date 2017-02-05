@@ -71,6 +71,7 @@ impl<K, V, C, R> Merger<K, V, C, R> {
     }
 }
 
+/// Contains common resolver implementations for use with `Merger::with_resolver(...)`.
 pub mod resolve {
     use std::borrow::Cow;
     /// Always resolve a conflict with the new Value. This is the default for `Merger::from(...)`.

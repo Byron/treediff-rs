@@ -18,6 +18,7 @@
 //! [diffalgo]: https://docs.rs/treediff/*/treediff/fn.diff.html
 //! [diff-tests]: https://github.com/Byron/treediff-rs/blob/master/tests/diff.rs
 //! [merge-tests]: https://github.com/Byron/treediff-rs/blob/master/tests/merge.rs
+#![deny(missing_docs)]
 #[cfg(feature = "with-rustc-serialize")]
 extern crate rustc_serialize;
 #[cfg(feature = "with-serde-json")]
