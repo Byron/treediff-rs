@@ -7,11 +7,9 @@ extern crate serde_json;
 
 mod traitdef;
 mod diff;
-mod recorder;
-mod merger;
+pub mod record;
+pub mod merge;
 pub mod value;
 
 pub use traitdef::*;
 pub use diff::*;
-pub use recorder::*;
-pub use merger::*;

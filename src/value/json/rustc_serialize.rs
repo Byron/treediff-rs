@@ -1,6 +1,6 @@
 use traitdef::Value;
 use rustc_serialize::json::{Object, Json};
-use merger::Mergeable;
+use merge::Mergeable;
 use std::mem;
 use std::collections::btree_map::Entry::*;
 use super::JsonKey;

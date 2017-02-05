@@ -2,7 +2,8 @@ extern crate treediff;
 
 macro_rules! make_suite {
 () => {
-    use treediff::{diff, Merger, pick_new, pick_old, drop_removed};
+    use treediff::diff;
+    use treediff::merge::{Merger, pick_new, pick_old, drop_removed};
     use std::borrow::Cow;
 
     fn make_object() -> Json {

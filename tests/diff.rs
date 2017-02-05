@@ -4,10 +4,11 @@ extern crate treediff;
 #[cfg(feature = "with-rustc-serialize")]
 mod diff {
     extern crate rustc_serialize;
-    use treediff::{diff, Recorder};
+    use treediff::diff;
+    use treediff::record::Recorder;
+    use treediff::record::ChangeType::*;
     use treediff::value::json::JsonKey;
     use self::rustc_serialize::json::Json;
-    use treediff::ChangeType::*;
 
     fn k(s: &'static str) -> JsonKey {
         JsonKey::String(s.into())

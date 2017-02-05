@@ -1,7 +1,7 @@
 use traitdef::Value;
 use super::JsonKey;
 use serde_json::{Map, Value as Json};
-use merger::Mergeable;
+use merge::Mergeable;
 use std::mem;
 
 impl Value for Json {
