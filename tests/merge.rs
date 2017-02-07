@@ -3,8 +3,7 @@ extern crate treediff;
 macro_rules! make_suite {
 () => {
     use treediff::diff;
-    use treediff::tools::Merger;
-    use treediff::tools::resolve::{pick_none, pick_new, pick_old, drop_removed};
+    use treediff::tools::{MutableFilter, Merger};
     use std::borrow::Cow;
 
     fn make_object() -> Json {
@@ -84,22 +83,21 @@ macro_rules! make_suite {
     }
 
     #[test]
-    fn modified_at_root_with_resolver_pick_none() {
+    fn modified_at_root_with_owned_filter_pick_none() {
         let v1 = r#"{"1": 1}"#.parse().unwrap();
         let v2 = r#"{"1": 2}"#.parse().unwrap();
         let v3: Json = r#"{}"#.parse().unwrap();
-        let mut m = Merger::with_resolver(Json::clone(&v2), pick_none, drop_removed);
+        struct Filter;
+        impl MutableFilter for Filter {
+            fn resolve_conflict<'a, K, V: Clone>(&mut self, _keys: &[K], _old: &'a V, _new: &'a V,
+                                                 _self: &mut V)
+                                                 -> Option<Cow<'a, V>> {
+                None
+            }
+        }
+        let mut m = Merger::with_filter(Json::clone(&v2), Filter);
         diff(&v1, &v2, &mut m);
         assert_eq!(v3, m.into_inner());
-    }
-
-    #[test]
-    fn modified_at_root_with_resolver_pick_old() {
-        let v1 = r#"{"1": 1}"#.parse().unwrap();
-        let v2 = r#"{"1": 2}"#.parse().unwrap();
-        let mut m = Merger::with_resolver(Json::clone(&v2), pick_old, drop_removed);
-        diff(&v1, &v2, &mut m);
-        assert_eq!(v1, m.into_inner());
     }
 
     #[test]
@@ -112,15 +110,21 @@ macro_rules! make_suite {
     }
 
     #[test]
-    fn removed_at_root_with_resolver() {
-        pub fn incr<'a, K, V: Clone>(_keys: &[K], removed: &'a V, _self: &mut V)
-                -> Option<Cow<'a, V>>
-        {
-            Some(Cow::Borrowed(removed))
+    fn removed_at_root_with_borrowed_filter() {
+        struct Filter;
+        impl MutableFilter for Filter {
+            fn resolve_removal<'a, K, V: Clone>(&mut self,
+                                               _keys: &[K],
+                                               removed: &'a V,
+                                               _self: &mut V)
+                                               -> Option<Cow<'a, V>> {
+                Some(Cow::Borrowed(removed))
+            }
         }
         let v1 = r#"{"1": 1, "2": 2}"#.parse().unwrap();
         let v2 = r#"{"1": 1}"#.parse().unwrap();
-        let mut m = Merger::with_resolver(Json::clone(&v1), pick_new, incr);
+        let mut f = Filter;
+        let mut m = Merger::<_, _, _, Filter>::with_filter(Json::clone(&v1), &mut f);
         diff(&v1, &v2, &mut m);
         assert_eq!(v1, m.into_inner());
     }

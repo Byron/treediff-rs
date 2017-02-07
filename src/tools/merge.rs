@@ -1,5 +1,7 @@
 use traitdef::{Mutable, Delegate};
 use std::borrow::Cow;
+use std::borrow::BorrowMut;
+use std::marker::PhantomData;
 
 /// A `Delegate` which applies differences to a target object.
 ///
@@ -13,11 +15,11 @@ use std::borrow::Cow;
 /// # Examples
 /// Please see the [tests][tests] for usage examples.
 /// [tests]: https://github.com/Byron/treediff-rs/blob/master/tests/merge.rs#L22
-pub struct Merger<K, V, C, R> {
+pub struct Merger<K, V, BF, F> {
     cursor: Vec<K>,
     inner: V,
-    resolve_conflict: C,
-    handle_removal: R,
+    handler: BF,
+    _d: PhantomData<F>,
 }
 
 fn appended<'b, K>(keys: &Vec<K>, k: Option<&'b K>) -> Vec<K>
@@ -30,11 +32,49 @@ fn appended<'b, K>(keys: &Vec<K>, k: Option<&'b K>) -> Vec<K>
     keys
 }
 
-impl<'a, K, V, C, R> Delegate<'a, K, V> for Merger<K, V, C, R>
+/// A filter to manipulate calls to be made to `Value`s implementing the `Mutable` trait in calls
+/// made by the `Merger` `Delegate`.
+///
+/// This allows you to control the exact way merge operations are performed independently of the
+/// type implementing the `Value` trait, which usually is not under your control.
+pub trait MutableFilter {
+    /// Called during `Delegate::modified(...)`, returns `None` to cause the Value at the `keys` to
+    /// be removed, or any Value to be set in its place.
+    ///
+    /// `old` is the previous value at the given `keys` path, and `new` is the one now at its place.
+    /// `_self` provides access to the target of the merge operation.
+    fn resolve_conflict<'a, K, V: Clone>(&mut self,
+                                         _keys: &[K],
+                                         _old: &'a V,
+                                         new: &'a V,
+                                         _self: &mut V)
+                                         -> Option<Cow<'a, V>> {
+        Some(Cow::Borrowed(new))
+    }
+    /// Called during `Delegate::removed(...)`, returns `None` to allow the Value at the `keys` path
+    /// to be removed, or any Value to be set in its place instead.
+    ///
+    /// `removed` is the Value which is to be removed.
+    fn resolve_removal<'a, K, V: Clone>(&mut self,
+                                        _keys: &[K],
+                                        _removed: &'a V,
+                                        _self: &mut V)
+                                        -> Option<Cow<'a, V>> {
+        None
+    }
+}
+
+/// The default implementation used when when creating a new `Merger` from any `Value` type.
+///
+/// If you want to choose your own filter, use `Merger::with_filter(...)` instead.
+pub struct DefaultMutableFilter;
+impl MutableFilter for DefaultMutableFilter {}
+
+impl<'a, K, V, F, BF> Delegate<'a, K, V> for Merger<K, V, BF, F>
     where V: Mutable<Key = K, Item = V> + Clone + 'a,
           K: Clone,
-          C: Fn(&'a V, &'a V, &mut V) -> Option<Cow<'a, V>>,
-          R: Fn(&[K], &'a V, &mut V) -> Option<Cow<'a, V>>
+          F: MutableFilter,
+          BF: BorrowMut<F>
 {
     fn push<'b>(&mut self, k: &'b K) {
         self.cursor.push(k.clone());
@@ -44,7 +84,7 @@ impl<'a, K, V, C, R> Delegate<'a, K, V> for Merger<K, V, C, R>
     }
     fn removed<'b>(&mut self, k: &'b K, v: &'a V) {
         let keys = appended(&self.cursor, Some(k));
-        match (self.handle_removal)(&keys, v, &mut self.inner) {
+        match self.handler.borrow_mut().resolve_removal(&keys, v, &mut self.inner) {
             Some(nv) => self.inner.set(&keys, &nv),
             None => self.inner.remove(&keys),
         }
@@ -57,83 +97,47 @@ impl<'a, K, V, C, R> Delegate<'a, K, V> for Merger<K, V, C, R>
     }
     fn modified<'b>(&mut self, old: &'a V, new: &'a V) {
         let keys = appended(&self.cursor, None);
-        match (self.resolve_conflict)(old, new, &mut self.inner) {
+        match self.handler.borrow_mut().resolve_conflict(&keys, old, new, &mut self.inner) {
             Some(v) => self.inner.set(&keys, &v),
             None => self.inner.remove(&keys),
         }
     }
 }
 
-impl<K, V, C, R> Merger<K, V, C, R> {
-    /// Consume `self` and return the mutated Value.
+impl<K, V, BF, F> Merger<K, V, BF, F> {
+    /// Consume the merger and return the contained target Value, which is the result of the
+    /// merge operation.
     pub fn into_inner(self) -> V {
         self.inner
     }
 }
 
-/// Contains common resolver implementations for use with `Merger::with_resolver(...)`.
-pub mod resolve {
-    use std::borrow::Cow;
-    /// Always resolve a conflict with the new Value. This is the default for `Merger::from(...)`.
-    pub fn pick_new<'a, V: Clone>(_old: &'a V, new: &'a V, _self: &mut V) -> Option<Cow<'a, V>> {
-        Some(Cow::Borrowed(new))
-    }
-
-    /// Always resolve a conflict with the old Value.
-    pub fn pick_old<'a, V: Clone>(old: &'a V, _new: &'a V, _self: &mut V) -> Option<Cow<'a, V>> {
-        Some(Cow::Borrowed(old))
-    }
-
-    /// Always resolve a conflict with the no Value, and cause the deletion of the conflicting
-    /// Value.
-    pub fn pick_none<'a, V: Clone>(_old: &'a V, _new: &'a V, _self: &mut V) -> Option<Cow<'a, V>> {
-        None
-    }
-
-    /// Always drop removed values. This is the default for `Merger::from(...)`.
-    pub fn drop_removed<'a, K, V: Clone>(_keys: &[K],
-                                         _removed: &'a V,
-                                         _self: &mut V)
-                                         -> Option<Cow<'a, V>> {
-        None
-    }
-}
-
-
-impl<'a, V, C, R> Merger<V::Key, V, C, R>
+impl<'a, V, BF, F> Merger<V::Key, V, BF, F>
     where V: Mutable + 'a + Clone,
-          C: Fn(&'a V, &'a V, &mut V) -> Option<Cow<'a, V>>,
-          R: Fn(&[V::Key], &'a V, &mut V) -> Option<Cow<'a, V>>
+          F: MutableFilter,
+          BF: BorrowMut<F>
 {
-    /// Return a new Merger with the given initial value `v`, conflict resolver `c` and
-    /// removal handler `r`.
-    pub fn with_resolver(v: V, c: C, r: R) -> Self {
+    /// Return a new Merger with the given initial value `v` and the filter `f`
+    pub fn with_filter(v: V, f: BF) -> Self {
         Merger {
             inner: v,
             cursor: Vec::new(),
-            resolve_conflict: c,
-            handle_removal: r,
+            handler: f,
+            _d: PhantomData,
         }
     }
 }
 
-impl<'a, V> From<V>
-    for Merger<V::Key,
-                                   V,
-                                   fn(&'a V, &'a V, &mut V) -> Option<Cow<'a, V>>,
-                                   fn(&[V::Key], &'a V, &mut V) -> Option<Cow<'a, V>>>
+impl<'a, V> From<V> for Merger<V::Key, V, DefaultMutableFilter, DefaultMutableFilter>
     where V: Mutable + 'a + Clone
 {
-    /// Return a new merger with the given initial value `v`, `pick_new` as conflict resolver
-    /// and `drop_removed` as handler for removals.
+    /// Return a new merger with the given initial value `v`, and the `DefaultMutableFilter`.
     fn from(v: V) -> Self {
-        use self::resolve::{pick_new, drop_removed};
         Merger {
             inner: v,
             cursor: Vec::new(),
-            resolve_conflict: pick_new::<V> as fn(&'a V, &'a V, &mut V) -> Option<Cow<'a, V>>,
-            handle_removal: drop_removed::<V::Key, V> as
-                            fn(&[V::Key], &'a V, &mut V) -> Option<Cow<'a, V>>,
+            handler: DefaultMutableFilter,
+            _d: PhantomData,
         }
     }
 }
