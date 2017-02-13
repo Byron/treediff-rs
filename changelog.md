@@ -1,3 +1,8 @@
+<a name="v2.1.1"></a>
+### v2.1.1 (2017-02-13)
+
+* fix library documentation links
+
 <a name="v2.1.0"></a>
 ## v2.1.0 (2017-02-13)
 
