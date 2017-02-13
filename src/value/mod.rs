@@ -9,3 +9,6 @@ mod rustc_json;
 
 #[cfg(feature = "with-serde-json")]
 mod serde_json;
+
+#[cfg(feature = "with-serde-yaml")]
+mod serde_yaml;

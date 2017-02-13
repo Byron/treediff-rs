@@ -5,10 +5,6 @@ macro_rules! make_suite {
     use treediff::Value;
     use treediff::value::Key;
 
-    fn make(v: &str) -> Json {
-        v.parse().unwrap()
-    }
-
     #[test]
     fn scalar_values() {
         for v in &["null", "true", "1.23", "-1234456", "1234456", "\"string\""] {
@@ -21,7 +17,7 @@ macro_rules! make_suite {
     fn array() {
         let j = make(r#"[null, true]"#);
         assert_eq!(j.items().unwrap().collect::<Vec<_>>(),
-                   vec![(Key::Index(0), &Json::Null),
+                   vec![(Key::Index(0), &ValueType::Null),
                         (Key::Index(1), &$bool(true))]);
     }
 
@@ -29,7 +25,7 @@ macro_rules! make_suite {
     fn object() {
         let j = make(r#"{"a": null, "b": true}"#);
         assert_eq!(j.items().unwrap().collect::<Vec<_>>(),
-                   vec![(Key::String("a".into()), &Json::Null),
+                   vec![(Key::String("a".into()), &ValueType::Null),
                         (Key::String("b".into()), &$bool(true))]);
     }
 
@@ -42,18 +38,38 @@ macro_rules! make_suite {
 }
 
 
+#[cfg(feature = "with-serde-yaml")]
+mod serde_yaml {
+    extern crate serde_yaml;
+    use self::serde_yaml::{from_str, Value as ValueType};
+
+    fn make(v: &str) -> ValueType {
+        from_str(v).unwrap()
+    }
+
+    make_suite!(ValueType::Bool);
+}
+
 #[cfg(feature = "with-serde-json")]
 mod serde_json {
     extern crate serde_json;
-    use self::serde_json::Value as Json;
+    use self::serde_json::Value as ValueType;
 
-    make_suite!(Json::Bool);
+    fn make(v: &str) -> ValueType {
+        v.parse().unwrap()
+    }
+
+    make_suite!(ValueType::Bool);
 }
 
 #[cfg(feature = "with-rustc-serialize")]
 mod rustc_serialize {
     extern crate rustc_serialize;
-    use self::rustc_serialize::json::Json;
+    use self::rustc_serialize::json::Json as ValueType;
 
-    make_suite!(Json::Boolean);
+    fn make(v: &str) -> ValueType {
+        v.parse().unwrap()
+    }
+
+    make_suite!(ValueType::Boolean);
 }
