@@ -18,7 +18,7 @@ macro_rules! make_suite {
     fn unchanged_at_root_() {
         for s in &[r#"{"1": 1, "2": {"1" : 1}}"#, r#"-1"#, r#"1"#, r#""str""#] {
             for t in vec![make_object(), make_scalar()].into_iter() {
-                let v = s.parse().unwrap();
+                let v = make(s);
                 let mut m = Merger::from(t);
                 diff(&v, &v, &mut m);
                 assert_eq!(v, m.into_inner());
@@ -147,6 +147,18 @@ macro_rules! make_suite {
         assert_eq!(v2, m.into_inner());
     }
 }
+}
+
+#[cfg(feature = "with-serde-yaml")]
+mod serde_yaml {
+    extern crate serde_yaml;
+    use self::serde_yaml::{from_str, Value as ValueType};
+
+    fn make(v: &str) -> ValueType {
+        from_str(v).unwrap()
+    }
+
+    make_suite!();
 }
 
 #[cfg(feature = "with-serde-json")]

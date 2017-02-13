@@ -1,3 +1,9 @@
+<a name="v2.1.0"></a>
+## v2.1.0 (2017-02-13)
+
+* `serde_yaml` support, for both `diff` and `merge`.
+
+
 <a name="v2.0.1"></a>
 ### v2.0.1 (2017-02-07)
 
