@@ -1,3 +1,14 @@
+<a name="v2.3.0"></a>
+## v2.3.0 (2017-02-13)
+
+
+#### Improvements
+
+* **Merger:**  add AsRef implementation ([981c94af](https://github.com/Byron/treediff-rs/commit/981c94afe98cd1da11aed290562ebe4a1e7a60cc))
+* **safety:**  handle possiblity of underflow ([07eff4f9](https://github.com/Byron/treediff-rs/commit/07eff4f93816bc10d4b0d5d98bcaef03741ee2c0))
+
+
+
 <a name="v2.2.0"></a>
 ## v2.2.0 (2017-02-13)
 
