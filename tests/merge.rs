@@ -127,12 +127,29 @@ macro_rules! make_suite {
         let mut m = Merger::<_, _, _, Filter>::with_filter(ValueType::clone(&v1), &mut f);
         diff(&v1, &v2, &mut m);
         assert_eq!(v1, m.into_inner());
+
+        let v1 = make(r#"{"a": {"b" : "ab"}}"#);
+        let v2 = make(r#"{"a": {"c" : "ac"}}"#);
+        let v3 = make(r#"{"a": {"b" : "ab", "c" : "ac"}}"#);
+        let mut f = Filter;
+        let mut m = Merger::<_, _, _, Filter>::with_filter(ValueType::clone(&v1), &mut f);
+        diff(&v1, &v2, &mut m);
+        assert_eq!(v3, *m.as_ref());
     }
 
     #[test]
     fn removed_at_root() {
         let v1 = make(r#"{"1": 1, "2": 2}"#);
         let v2 = make(r#"{"1": 1}"#);
+        let mut m = Merger::from(ValueType::clone(&v1));
+        diff(&v1, &v2, &mut m);
+        assert_eq!(v2, m.into_inner());
+    }
+
+    #[test]
+    fn modified_scalar_at_root() {
+        let v1 = make(r#"null"#);
+        let v2 = make(r#"1"#);
         let mut m = Merger::from(ValueType::clone(&v1));
         diff(&v1, &v2, &mut m);
         assert_eq!(v2, m.into_inner());

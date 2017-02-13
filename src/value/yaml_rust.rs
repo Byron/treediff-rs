@@ -5,8 +5,10 @@ use yaml_rust::yaml::Hash;
 use std::mem;
 
 fn from_str(s: &str) -> Yaml {
-    let mut v = YamlLoader::load_from_str(s).expect("valid yaml value - we serialized it beforehand after all");
-    assert!(v.len() == 1, "need exactly one document - multi-document keys are just not possible");
+    let mut v = YamlLoader::load_from_str(s)
+        .expect("valid yaml value - we serialized it beforehand after all");
+    assert!(v.len() == 1,
+            "need exactly one document - multi-document keys are just not possible");
     v.pop().unwrap()
 }
 

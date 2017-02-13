@@ -112,6 +112,12 @@ impl<K, V, BF, F> Merger<K, V, BF, F> {
     }
 }
 
+impl<K, V, BF, F> AsRef<V> for Merger<K, V, BF, F> {
+    fn as_ref(&self) -> &V {
+        &self.inner
+    }
+}
+
 impl<'a, V, BF, F> Merger<V::Key, V, BF, F>
     where V: Mutable + 'a + Clone,
           F: MutableFilter,
