@@ -1,3 +1,8 @@
+<a name="v2.2.0"></a>
+## v2.2.0 (2017-02-13)
+
+* `yaml_rust` support, for both `diff` and `merge`.
+
 <a name="v2.1.1"></a>
 ### v2.1.1 (2017-02-13)
 

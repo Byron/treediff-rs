@@ -7,7 +7,7 @@ categories = ["algorithms"]
 license = "MIT/Apache-2.0"
 name = "treediff"
 repository = "https://github.com/Byron/treediff-rs"
-version = "2.1.1"
+version = "2.2.0"
 
 [dependencies]
 rustc-serialize = {version = "0.3.22", optional = true}
