@@ -13,9 +13,11 @@ version = "2.1.1"
 rustc-serialize = {version = "0.3.22", optional = true}
 serde_json = {version = "0.9", optional = true}
 serde_yaml = {version = "0.6", optional = true}
+yaml-rust = {version = "0.3", optional = true}
 
 [features]
 with-rustc-serialize = ["rustc-serialize"]
 with-serde-json = ["serde_json"]
 with-serde-yaml = ["serde_yaml"]
+with-yaml-rust = ["yaml-rust"]
 

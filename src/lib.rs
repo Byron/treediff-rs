@@ -25,6 +25,8 @@ extern crate rustc_serialize;
 extern crate serde_json;
 #[cfg(feature = "with-serde-yaml")]
 extern crate serde_yaml;
+#[cfg(feature = "with-yaml-rust")]
+extern crate yaml_rust;
 
 
 mod traitdef;

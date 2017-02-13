@@ -12,3 +12,6 @@ mod serde_json;
 
 #[cfg(feature = "with-serde-yaml")]
 mod serde_yaml;
+
+#[cfg(feature = "with-yaml-rust")]
+mod yaml_rust;

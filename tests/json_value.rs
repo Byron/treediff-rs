@@ -37,6 +37,17 @@ macro_rules! make_suite {
 };
 }
 
+#[cfg(feature = "with-yaml-rust")]
+mod yaml_rust {
+    extern crate yaml_rust;
+    use self::yaml_rust::{Yaml as ValueType, YamlLoader};
+
+    fn make(v: &str) -> ValueType {
+        YamlLoader::load_from_str(v).unwrap().pop().unwrap()
+    }
+
+    make_suite!(ValueType::Boolean);
+}
 
 #[cfg(feature = "with-serde-yaml")]
 mod serde_yaml {
