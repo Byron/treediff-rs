@@ -149,7 +149,7 @@ impl Mutable for SerdeYaml {
 
     fn remove(&mut self, keys: &[Self::Key]) {
         let mut c = self;
-        let last_key_index = keys.len() - 1;
+        let last_key_index = keys.len().checked_sub(1).expect("at least one key");
         for (i, k) in keys.iter().enumerate() {
             c = match *k {
                 Key::String(ref k) => {
