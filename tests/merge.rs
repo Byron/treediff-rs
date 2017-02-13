@@ -6,12 +6,12 @@ macro_rules! make_suite {
     use treediff::tools::{MutableFilter, Merger};
     use std::borrow::Cow;
 
-    fn make_object() -> Json {
-        Json::Object(Object::new())
+    fn make_object() -> ValueType {
+        make(r#"{}"#)
     }
 
-    fn make_scalar() -> Json {
-        Json::Null
+    fn make_scalar() -> ValueType {
+        make(r#"null"#)
     }
 
     #[test]
@@ -28,45 +28,45 @@ macro_rules! make_suite {
 
     #[test]
     fn nested_object_in_array_modified() {
-        let v1 = r#"{"a": [{"1": 1}]}"#.parse().unwrap();
-        let v2 = r#"{"a": [{"1": 2}]}"#.parse().unwrap();
-        let mut m = Merger::from(Json::clone(&v1));
+        let v1 = make(r#"{"a": [{"1": 1}]}"#);
+        let v2 = make(r#"{"a": [{"1": 2}]}"#);
+        let mut m = Merger::from(ValueType::clone(&v1));
         diff(&v1, &v2, &mut m);
         assert_eq!(v2, m.into_inner());
     }
 
     #[test]
     fn nested_object_in_array_removed() {
-        let v1 = r#"{"a": [{"1": 2}]}"#.parse().unwrap();
-        let v2 = r#"{"a": []}"#.parse().unwrap();
-        let mut m = Merger::from(Json::clone(&v1));
+        let v1 = make(r#"{"a": [{"1": 2}]}"#);
+        let v2 = make(r#"{"a": []}"#);
+        let mut m = Merger::from(ValueType::clone(&v1));
         diff(&v1, &v2, &mut m);
         assert_eq!(v2, m.into_inner());
     }
 
     #[test]
     fn nested_object_in_array_added() {
-        let v1 = r#"{"a": []}"#.parse().unwrap();
-        let v2 = r#"{"a": [{"1": 2}]}"#.parse().unwrap();
-        let mut m = Merger::from(Json::clone(&v1));
+        let v1 = make(r#"{"a": []}"#);
+        let v2 = make(r#"{"a": [{"1": 2}]}"#);
+        let mut m = Merger::from(ValueType::clone(&v1));
         diff(&v1, &v2, &mut m);
         assert_eq!(v2, m.into_inner());
     }
 
     #[test]
     fn modified_array_at_root() {
-        let v1 = r#"[1]"#.parse().unwrap();
-        let v2 = r#"[2]"#.parse().unwrap();
-        let mut m = Merger::from(Json::clone(&v1));
+        let v1 = make(r#"[1]"#);
+        let v2 = make(r#"[2]"#);
+        let mut m = Merger::from(ValueType::clone(&v1));
         diff(&v1, &v2, &mut m);
         assert_eq!(v2, m.into_inner());
     }
 
     #[test]
     fn added_array_at_root_scalar_target() {
-        let v1 = r#"[]"#.parse().unwrap();
-        let v2 = r#"[1, 2]"#.parse().unwrap();
-        let t: Json = r#"null"#.parse().unwrap();
+        let v1 = make(r#"[]"#);
+        let v2 = make(r#"[1, 2]"#);
+        let t: ValueType = make(r#"null"#);
         let mut m = Merger::from(t);
         diff(&v1, &v2, &mut m);
         assert_eq!(v2, m.into_inner());
@@ -74,9 +74,9 @@ macro_rules! make_suite {
 
     #[test]
     fn modified_at_root_scalar_target() {
-        let v1 = r#"{"1": 1, "a": {"2": 2}}"#.parse().unwrap();
-        let v2 = r#"{"1": 1, "a": {"2": 1}}"#.parse().unwrap();
-        let t: Json = r#"null"#.parse().unwrap();
+        let v1 = make(r#"{"1": 1, "a": {"2": 2}}"#);
+        let v2 = make(r#"{"1": 1, "a": {"2": 1}}"#);
+        let t: ValueType = make(r#"null"#);
         let mut m = Merger::from(t);
         diff(&v1, &v2, &mut m);
         assert_eq!(v2, m.into_inner());
@@ -84,9 +84,9 @@ macro_rules! make_suite {
 
     #[test]
     fn modified_at_root_with_owned_filter_pick_none() {
-        let v1 = r#"{"1": 1}"#.parse().unwrap();
-        let v2 = r#"{"1": 2}"#.parse().unwrap();
-        let v3: Json = r#"{}"#.parse().unwrap();
+        let v1 = make(r#"{"1": 1}"#);
+        let v2 = make(r#"{"1": 2}"#);
+        let v3: ValueType = make(r#"{}"#);
         struct Filter;
         impl MutableFilter for Filter {
             fn resolve_conflict<'a, K, V: Clone>(&mut self, _keys: &[K], _old: &'a V, _new: &'a V,
@@ -95,16 +95,16 @@ macro_rules! make_suite {
                 None
             }
         }
-        let mut m = Merger::with_filter(Json::clone(&v2), Filter);
+        let mut m = Merger::with_filter(ValueType::clone(&v2), Filter);
         diff(&v1, &v2, &mut m);
         assert_eq!(v3, m.into_inner());
     }
 
     #[test]
     fn modified_at_root() {
-        let v1 = r#"{"1": 1}"#.parse().unwrap();
-        let v2 = r#"{"1": 2}"#.parse().unwrap();
-        let mut m = Merger::from(Json::clone(&v1));
+        let v1 = make(r#"{"1": 1}"#);
+        let v2 = make(r#"{"1": 2}"#);
+        let mut m = Merger::from(ValueType::clone(&v1));
         diff(&v1, &v2, &mut m);
         assert_eq!(v2, m.into_inner());
     }
@@ -121,38 +121,42 @@ macro_rules! make_suite {
                 Some(Cow::Borrowed(removed))
             }
         }
-        let v1 = r#"{"1": 1, "2": 2}"#.parse().unwrap();
-        let v2 = r#"{"1": 1}"#.parse().unwrap();
+        let v1 = make(r#"{"1": 1, "2": 2}"#);
+        let v2 = make(r#"{"1": 1}"#);
         let mut f = Filter;
-        let mut m = Merger::<_, _, _, Filter>::with_filter(Json::clone(&v1), &mut f);
+        let mut m = Merger::<_, _, _, Filter>::with_filter(ValueType::clone(&v1), &mut f);
         diff(&v1, &v2, &mut m);
         assert_eq!(v1, m.into_inner());
     }
 
     #[test]
     fn removed_at_root() {
-        let v1 = r#"{"1": 1, "2": 2}"#.parse().unwrap();
-        let v2 = r#"{"1": 1}"#.parse().unwrap();
-        let mut m = Merger::from(Json::clone(&v1));
+        let v1 = make(r#"{"1": 1, "2": 2}"#);
+        let v2 = make(r#"{"1": 1}"#);
+        let mut m = Merger::from(ValueType::clone(&v1));
         diff(&v1, &v2, &mut m);
         assert_eq!(v2, m.into_inner());
     }
 
     #[test]
     fn added_at_root() {
-        let v1 = r#"{"1": 1}"#.parse().unwrap();
-        let v2 = r#"{"1": 1, "2": 2}"#.parse().unwrap();
-        let mut m = Merger::from(Json::clone(&v1));
+        let v1 = make(r#"{"1": 1}"#);
+        let v2 = make(r#"{"1": 1, "2": 2}"#);
+        let mut m = Merger::from(ValueType::clone(&v1));
         diff(&v1, &v2, &mut m);
         assert_eq!(v2, m.into_inner());
     }
 }
 }
 
-#[cfg(feature = "with-rustc-serialize")]
+#[cfg(feature = "with-serde-json")]
 mod serde_json {
     extern crate serde_json;
-    use self::serde_json::{Map as Object, Value as Json};
+    use self::serde_json::Value as ValueType;
+
+    fn make(v: &str) -> ValueType {
+        v.parse().unwrap()
+    }
 
     make_suite!();
 }
@@ -160,7 +164,11 @@ mod serde_json {
 #[cfg(feature = "with-rustc-serialize")]
 mod rustc_serialize {
     extern crate rustc_serialize;
-    use self::rustc_serialize::json::{Object, Json};
+    use self::rustc_serialize::json::Json as ValueType;
+
+    fn make(v: &str) -> ValueType {
+        v.parse().unwrap()
+    }
 
     make_suite!();
 }
