@@ -1,4 +1,5 @@
 use traitdef::{Mutable, Delegate};
+use std::fmt::Display;
 use std::borrow::Cow;
 use std::borrow::BorrowMut;
 use std::marker::PhantomData;
@@ -43,23 +44,23 @@ pub trait MutableFilter {
     ///
     /// `old` is the previous value at the given `keys` path, and `new` is the one now at its place.
     /// `_self` provides access to the target of the merge operation.
-    fn resolve_conflict<'a, K, V: Clone>(&mut self,
-                                         _keys: &[K],
-                                         _old: &'a V,
-                                         new: &'a V,
-                                         _self: &mut V)
-                                         -> Option<Cow<'a, V>> {
+    fn resolve_conflict<'a, K: Clone + Display, V: Clone>(&mut self,
+                                                          _keys: &[K],
+                                                          _old: &'a V,
+                                                          new: &'a V,
+                                                          _self: &mut V)
+                                                          -> Option<Cow<'a, V>> {
         Some(Cow::Borrowed(new))
     }
     /// Called during `Delegate::removed(...)`, returns `None` to allow the Value at the `keys` path
     /// to be removed, or any Value to be set in its place instead.
     ///
     /// `removed` is the Value which is to be removed.
-    fn resolve_removal<'a, K, V: Clone>(&mut self,
-                                        _keys: &[K],
-                                        _removed: &'a V,
-                                        _self: &mut V)
-                                        -> Option<Cow<'a, V>> {
+    fn resolve_removal<'a, K: Clone + Display, V: Clone>(&mut self,
+                                                         _keys: &[K],
+                                                         _removed: &'a V,
+                                                         _self: &mut V)
+                                                         -> Option<Cow<'a, V>> {
         None
     }
 }
@@ -72,7 +73,7 @@ impl MutableFilter for DefaultMutableFilter {}
 
 impl<'a, K, V, F, BF> Delegate<'a, K, V> for Merger<K, V, BF, F>
     where V: Mutable<Key = K, Item = V> + Clone + 'a,
-          K: Clone,
+          K: Clone + Display,
           F: MutableFilter,
           BF: BorrowMut<F>
 {
