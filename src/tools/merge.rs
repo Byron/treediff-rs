@@ -18,7 +18,7 @@ use std::marker::PhantomData;
 pub struct Merger<K, V, BF, F> {
     cursor: Vec<K>,
     inner: V,
-    handler: BF,
+    filter: BF,
     _d: PhantomData<F>,
 }
 
@@ -84,7 +84,7 @@ impl<'a, K, V, F, BF> Delegate<'a, K, V> for Merger<K, V, BF, F>
     }
     fn removed<'b>(&mut self, k: &'b K, v: &'a V) {
         let keys = appended(&self.cursor, Some(k));
-        match self.handler.borrow_mut().resolve_removal(&keys, v, &mut self.inner) {
+        match self.filter.borrow_mut().resolve_removal(&keys, v, &mut self.inner) {
             Some(nv) => self.inner.set(&keys, &nv),
             None => self.inner.remove(&keys),
         }
@@ -97,7 +97,7 @@ impl<'a, K, V, F, BF> Delegate<'a, K, V> for Merger<K, V, BF, F>
     }
     fn modified<'b>(&mut self, old: &'a V, new: &'a V) {
         let keys = appended(&self.cursor, None);
-        match self.handler.borrow_mut().resolve_conflict(&keys, old, new, &mut self.inner) {
+        match self.filter.borrow_mut().resolve_conflict(&keys, old, new, &mut self.inner) {
             Some(v) => self.inner.set(&keys, &v),
             None => self.inner.remove(&keys),
         }
@@ -109,6 +109,11 @@ impl<K, V, BF, F> Merger<K, V, BF, F> {
     /// merge operation.
     pub fn into_inner(self) -> V {
         self.inner
+    }
+
+    /// Returns a borrow to the `MutableFilter` instance
+    pub fn filter(&self) -> &BF {
+        &self.filter
     }
 }
 
@@ -128,7 +133,7 @@ impl<'a, V, BF, F> Merger<V::Key, V, BF, F>
         Merger {
             inner: v,
             cursor: Vec::new(),
-            handler: f,
+            filter: f,
             _d: PhantomData,
         }
     }
@@ -142,7 +147,7 @@ impl<'a, V> From<V> for Merger<V::Key, V, DefaultMutableFilter, DefaultMutableFi
         Merger {
             inner: v,
             cursor: Vec::new(),
-            handler: DefaultMutableFilter,
+            filter: DefaultMutableFilter,
             _d: PhantomData,
         }
     }
