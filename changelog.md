@@ -1,3 +1,13 @@
+<a name="v2.5.0"></a>
+## v2.5.0 (2017-02-14)
+
+
+#### Improvements
+
+* **merger:**  allow keys to be cloned and displayed ([75fae1b2](https://github.com/Byron/treediff-rs/commit/75fae1b2c30b9ce42012f1c9d63118e0443b9b6f))
+
+
+
 <a name="v2.4.0"></a>
 ## v2.4.0 (2017-02-14)
 
