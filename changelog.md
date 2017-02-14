@@ -1,3 +1,15 @@
+<a name="v2.4.0"></a>
+## v2.4.0 (2017-02-14)
+
+
+#### Improvements
+
+* **merger:**
+  *  method to obtain mutable borrow to filter ([eeb3a2da](https://github.com/Byron/treediff-rs/commit/eeb3a2da52c22d7e820fe3a40c74e55a2431ff9e))
+  *  method to obtain immutable reference to filter. ([fc210ea4](https://github.com/Byron/treediff-rs/commit/fc210ea42354be6e8febcd210bd9630040bd357d))
+
+
+
 <a name="v2.3.0"></a>
 ## v2.3.0 (2017-02-13)
 
