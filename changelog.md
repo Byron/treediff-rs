@@ -1,3 +1,13 @@
+<a name="v2.5.1"></a>
+### v2.5.1 (2017-02-22)
+
+
+#### Improvements
+
+* **upgrade:**  use serde 0.9.8 and Map::Entry ([60923752](https://github.com/Byron/treediff-rs/commit/6092375279e6fe184c8b457f0e6eb5a9f7f05d3b))
+
+
+
 <a name="v2.5.0"></a>
 ## v2.5.0 (2017-02-14)
 
