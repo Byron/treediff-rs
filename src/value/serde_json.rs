@@ -1,6 +1,6 @@
 use traitdef::{Mutable, Value};
 use super::Key;
-use serde_json::{Map, Value as SerdeJson};
+use serde_json::{Map, Value as SerdeJson, map};
 use std::mem;
 
 impl Value for SerdeJson {
@@ -65,16 +65,16 @@ impl Mutable for SerdeJson {
                             c
                         } {
                             &mut SerdeJson::Object(ref mut obj) => {
-                                if obj.contains_key(k) {
-                                    let obj = obj.get_mut(k).expect("map to work");
-                                    if i == last_key_index {
-                                        *obj = v.clone();
-                                        return;
+                                match obj.entry(k.clone()) {
+                                    map::Entry::Vacant(e) => e.insert(object_or_value(i)),
+                                    map::Entry::Occupied(e) => {
+                                        if i == last_key_index {
+                                            *e.into_mut() = v.clone();
+                                            return;
+                                        } else {
+                                            e.into_mut()
+                                        }
                                     }
-                                    obj
-                                } else {
-                                    obj.insert(k.clone(), object_or_value(i));
-                                    obj.get_mut(k).expect("map to work")
                                 }
                             }
                             c @ &mut SerdeJson::String(_) |
