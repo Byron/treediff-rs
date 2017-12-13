@@ -40,7 +40,8 @@ impl<'a, K, V> Default for Recorder<'a, K, V> {
 }
 
 fn mk<'b, K>(c: &Vec<K>, k: Option<&'b K>) -> Vec<K>
-    where K: Clone
+where
+    K: Clone,
 {
     let mut c = c.clone();
     match k {
@@ -53,7 +54,8 @@ fn mk<'b, K>(c: &Vec<K>, k: Option<&'b K>) -> Vec<K>
 }
 
 impl<'a, K, V> Delegate<'a, K, V> for Recorder<'a, K, V>
-    where K: Clone
+where
+    K: Clone,
 {
     fn push<'b>(&mut self, k: &'b K) {
         self.cursor.push(k.clone())
@@ -62,15 +64,19 @@ impl<'a, K, V> Delegate<'a, K, V> for Recorder<'a, K, V>
         self.cursor.pop();
     }
     fn removed<'b>(&mut self, k: &'b K, v: &'a V) {
-        self.calls.push(ChangeType::Removed(mk(&self.cursor, Some(k)), v));
+        self.calls
+            .push(ChangeType::Removed(mk(&self.cursor, Some(k)), v));
     }
     fn added<'b>(&mut self, k: &'b K, v: &'a V) {
-        self.calls.push(ChangeType::Added(mk(&self.cursor, Some(k)), v));
+        self.calls
+            .push(ChangeType::Added(mk(&self.cursor, Some(k)), v));
     }
     fn unchanged<'b>(&mut self, v: &'a V) {
-        self.calls.push(ChangeType::Unchanged(self.cursor.clone(), v));
+        self.calls
+            .push(ChangeType::Unchanged(self.cursor.clone(), v));
     }
     fn modified<'b>(&mut self, v1: &'a V, v2: &'a V) {
-        self.calls.push(ChangeType::Modified(mk(&self.cursor, None), v1, v2));
+        self.calls
+            .push(ChangeType::Modified(mk(&self.cursor, None), v1, v2));
     }
 }

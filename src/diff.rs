@@ -1,4 +1,4 @@
-use traitdef::{Value, Delegate};
+use traitdef::{Delegate, Value};
 use std::cmp::Ordering;
 use std::collections::BTreeSet;
 
@@ -13,9 +13,10 @@ use std::collections::BTreeSet;
 /// * `r` - the right Value
 /// * `d` - a `Delegate` to receive information about changes between `l` and `r`
 pub fn diff<'a, V, D>(l: &'a V, r: &'a V, d: &mut D)
-    where V: Value<Item = V>,
-          V::Key: Ord + Clone,
-          D: Delegate<'a, V::Key, V>
+where
+    V: Value<Item = V>,
+    V::Key: Ord + Clone,
+    D: Delegate<'a, V::Key, V>,
 {
     match (l.items(), r.items()) {
         // two scalars, equal
@@ -57,10 +58,15 @@ impl<'a, K, V> From<(K, &'a V)> for OrdByKey<'a, K, V> {
     }
 }
 
-impl<'a, K, V> Eq for OrdByKey<'a, K, V> where K: Eq + PartialOrd {}
+impl<'a, K, V> Eq for OrdByKey<'a, K, V>
+where
+    K: Eq + PartialOrd,
+{
+}
 
 impl<'a, K, V> PartialEq for OrdByKey<'a, K, V>
-    where K: PartialOrd
+where
+    K: PartialOrd,
 {
     fn eq(&self, other: &OrdByKey<'a, K, V>) -> bool {
         self.0.eq(&other.0)
@@ -68,7 +74,8 @@ impl<'a, K, V> PartialEq for OrdByKey<'a, K, V>
 }
 
 impl<'a, K, V> PartialOrd for OrdByKey<'a, K, V>
-    where K: PartialOrd
+where
+    K: PartialOrd,
 {
     fn partial_cmp(&self, other: &OrdByKey<'a, K, V>) -> Option<Ordering> {
         self.0.partial_cmp(&other.0)
@@ -76,7 +83,8 @@ impl<'a, K, V> PartialOrd for OrdByKey<'a, K, V>
 }
 
 impl<'a, K, V> Ord for OrdByKey<'a, K, V>
-    where K: Ord
+where
+    K: Ord,
 {
     fn cmp(&self, other: &Self) -> Ordering {
         self.0.cmp(&other.0)

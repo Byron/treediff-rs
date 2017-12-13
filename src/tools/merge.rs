@@ -1,4 +1,4 @@
-use traitdef::{Mutable, Delegate};
+use traitdef::{Delegate, Mutable};
 use std::fmt::Display;
 use std::borrow::Cow;
 use std::borrow::BorrowMut;
@@ -24,7 +24,8 @@ pub struct Merger<K, V, BF, F> {
 }
 
 fn appended<'b, K>(keys: &Vec<K>, k: Option<&'b K>) -> Vec<K>
-    where K: Clone
+where
+    K: Clone,
 {
     let mut keys = keys.clone();
     if let Some(k) = k {
@@ -44,23 +45,25 @@ pub trait MutableFilter {
     ///
     /// `old` is the previous value at the given `keys` path, and `new` is the one now at its place.
     /// `_self` provides access to the target of the merge operation.
-    fn resolve_conflict<'a, K: Clone + Display, V: Clone>(&mut self,
-                                                          _keys: &[K],
-                                                          _old: &'a V,
-                                                          new: &'a V,
-                                                          _self: &mut V)
-                                                          -> Option<Cow<'a, V>> {
+    fn resolve_conflict<'a, K: Clone + Display, V: Clone>(
+        &mut self,
+        _keys: &[K],
+        _old: &'a V,
+        new: &'a V,
+        _self: &mut V,
+    ) -> Option<Cow<'a, V>> {
         Some(Cow::Borrowed(new))
     }
     /// Called during `Delegate::removed(...)`, returns `None` to allow the Value at the `keys` path
     /// to be removed, or any Value to be set in its place instead.
     ///
     /// `removed` is the Value which is to be removed.
-    fn resolve_removal<'a, K: Clone + Display, V: Clone>(&mut self,
-                                                         _keys: &[K],
-                                                         _removed: &'a V,
-                                                         _self: &mut V)
-                                                         -> Option<Cow<'a, V>> {
+    fn resolve_removal<'a, K: Clone + Display, V: Clone>(
+        &mut self,
+        _keys: &[K],
+        _removed: &'a V,
+        _self: &mut V,
+    ) -> Option<Cow<'a, V>> {
         None
     }
 }
@@ -72,10 +75,11 @@ pub struct DefaultMutableFilter;
 impl MutableFilter for DefaultMutableFilter {}
 
 impl<'a, K, V, F, BF> Delegate<'a, K, V> for Merger<K, V, BF, F>
-    where V: Mutable<Key = K, Item = V> + Clone + 'a,
-          K: Clone + Display,
-          F: MutableFilter,
-          BF: BorrowMut<F>
+where
+    V: Mutable<Key = K, Item = V> + Clone + 'a,
+    K: Clone + Display,
+    F: MutableFilter,
+    BF: BorrowMut<F>,
 {
     fn push<'b>(&mut self, k: &'b K) {
         self.cursor.push(k.clone());
@@ -85,7 +89,10 @@ impl<'a, K, V, F, BF> Delegate<'a, K, V> for Merger<K, V, BF, F>
     }
     fn removed<'b>(&mut self, k: &'b K, v: &'a V) {
         let keys = appended(&self.cursor, Some(k));
-        match self.filter.borrow_mut().resolve_removal(&keys, v, &mut self.inner) {
+        match self.filter
+            .borrow_mut()
+            .resolve_removal(&keys, v, &mut self.inner)
+        {
             Some(nv) => self.inner.set(&keys, &nv),
             None => self.inner.remove(&keys),
         }
@@ -98,7 +105,10 @@ impl<'a, K, V, F, BF> Delegate<'a, K, V> for Merger<K, V, BF, F>
     }
     fn modified<'b>(&mut self, old: &'a V, new: &'a V) {
         let keys = appended(&self.cursor, None);
-        match self.filter.borrow_mut().resolve_conflict(&keys, old, new, &mut self.inner) {
+        match self.filter
+            .borrow_mut()
+            .resolve_conflict(&keys, old, new, &mut self.inner)
+        {
             Some(v) => self.inner.set(&keys, &v),
             None => self.inner.remove(&keys),
         }
@@ -130,9 +140,10 @@ impl<K, V, BF, F> AsRef<V> for Merger<K, V, BF, F> {
 }
 
 impl<'a, V, BF, F> Merger<V::Key, V, BF, F>
-    where V: Mutable + 'a + Clone,
-          F: MutableFilter,
-          BF: BorrowMut<F>
+where
+    V: Mutable + 'a + Clone,
+    F: MutableFilter,
+    BF: BorrowMut<F>,
 {
     /// Return a new Merger with the given initial value `v` and the filter `f`
     pub fn with_filter(v: V, f: BF) -> Self {
@@ -146,7 +157,8 @@ impl<'a, V, BF, F> Merger<V::Key, V, BF, F>
 }
 
 impl<'a, V> From<V> for Merger<V::Key, V, DefaultMutableFilter, DefaultMutableFilter>
-    where V: Mutable + 'a + Clone
+where
+    V: Mutable + 'a + Clone,
 {
     /// Return a new merger with the given initial value `v`, and the `DefaultMutableFilter`.
     fn from(v: V) -> Self {

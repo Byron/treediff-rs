@@ -169,7 +169,7 @@ macro_rules! make_suite {
 #[cfg(feature = "with-yaml-rust")]
 mod yaml_rust {
     extern crate yaml_rust;
-    use self::yaml_rust::{YamlLoader, Yaml as ValueType};
+    use self::yaml_rust::{Yaml as ValueType, YamlLoader};
 
     fn make(v: &str) -> ValueType {
         YamlLoader::load_from_str(v).unwrap().pop().unwrap()

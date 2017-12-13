@@ -1,6 +1,6 @@
 use traitdef::{Mutable, Value};
 use super::Key;
-use serde_yaml::{self, Mapping, Value as SerdeYaml, to_string};
+use serde_yaml::{self, to_string, Mapping, Value as SerdeYaml};
 use std::mem;
 
 fn from_str(s: &str) -> SerdeYaml {
@@ -12,23 +12,23 @@ impl Value for SerdeYaml {
     type Key = Key;
     fn items<'a>(&'a self) -> Option<Box<Iterator<Item = (Self::Key, &'a Self::Item)> + 'a>> {
         match *self {
-            SerdeYaml::String(_) |
-            SerdeYaml::I64(_) |
-            SerdeYaml::F64(_) |
-            SerdeYaml::Bool(_) |
-            SerdeYaml::Null => None,
-            SerdeYaml::Sequence(ref inner) => {
-                Some(Box::new(inner.iter().enumerate().map(|(i, v)| (Key::Index(i), v))))
-            }
-            SerdeYaml::Mapping(ref inner) => {
-                Some(Box::new(inner.iter().map(|(k, v)| {
-                    (Key::String(to_string(k)
-                             .expect("yaml value to serialize into yaml correctly")
-                                     [4..]
-                         .to_owned()),
-                     v)
-                })))
-            }
+            SerdeYaml::String(_)
+            | SerdeYaml::I64(_)
+            | SerdeYaml::F64(_)
+            | SerdeYaml::Bool(_)
+            | SerdeYaml::Null => None,
+            SerdeYaml::Sequence(ref inner) => Some(Box::new(
+                inner.iter().enumerate().map(|(i, v)| (Key::Index(i), v)),
+            )),
+            SerdeYaml::Mapping(ref inner) => Some(Box::new(inner.iter().map(|(k, v)| {
+                (
+                    Key::String(
+                        to_string(k).expect("yaml value to serialize into yaml correctly")[4..]
+                            .to_owned(),
+                    ),
+                    v,
+                )
+            }))),
         }
     }
 }
@@ -43,17 +43,20 @@ impl Mutable for SerdeYaml {
         } else {
             let mut c = self;
             let last_key_index = keys.len() - 1;
-            let object_or_value = |index| if index == last_key_index {
-                v.clone()
-            } else {
-                SerdeYaml::Mapping(Mapping::new())
+            let object_or_value = |index| {
+                if index == last_key_index {
+                    v.clone()
+                } else {
+                    SerdeYaml::Mapping(Mapping::new())
+                }
             };
-            fn runup_array_or_value<'a>(array: &'a mut Vec<SerdeYaml>,
-                                        target_index: usize,
-                                        key_index: usize,
-                                        last_key_index: usize,
-                                        v: &SerdeYaml)
-                                        -> &'a mut SerdeYaml {
+            fn runup_array_or_value<'a>(
+                array: &'a mut Vec<SerdeYaml>,
+                target_index: usize,
+                key_index: usize,
+                last_key_index: usize,
+                v: &SerdeYaml,
+            ) -> &'a mut SerdeYaml {
                 for _ in array.len()..target_index {
                     array.push(SerdeYaml::Null);
                 }
@@ -73,9 +76,7 @@ impl Mutable for SerdeYaml {
                 c = match *k {
                     Key::String(ref k) => {
                         let k = from_str(&k);
-                        match {
-                            c
-                        } {
+                        match { c } {
                             &mut SerdeYaml::Mapping(ref mut obj) => {
                                 if obj.contains_key(&k) {
                                     let obj = obj.get_mut(&k).expect("map to work");
@@ -89,18 +90,20 @@ impl Mutable for SerdeYaml {
                                     obj.get_mut(&k).expect("map to work")
                                 }
                             }
-                            c @ &mut SerdeYaml::String(_) |
-                            c @ &mut SerdeYaml::I64(_) |
-                            c @ &mut SerdeYaml::F64(_) |
-                            c @ &mut SerdeYaml::Bool(_) |
-                            c @ &mut SerdeYaml::Null |
-                            c @ &mut SerdeYaml::Sequence(_) => {
-                                mem::replace(c,
-                                             SerdeYaml::Mapping({
-                                                 let mut o = Mapping::new();
-                                                 o.insert(k.clone(), object_or_value(i));
-                                                 o
-                                             }));
+                            c @ &mut SerdeYaml::String(_)
+                            | c @ &mut SerdeYaml::I64(_)
+                            | c @ &mut SerdeYaml::F64(_)
+                            | c @ &mut SerdeYaml::Bool(_)
+                            | c @ &mut SerdeYaml::Null
+                            | c @ &mut SerdeYaml::Sequence(_) => {
+                                mem::replace(
+                                    c,
+                                    SerdeYaml::Mapping({
+                                        let mut o = Mapping::new();
+                                        o.insert(k.clone(), object_or_value(i));
+                                        o
+                                    }),
+                                );
                                 if i == last_key_index {
                                     return;
                                 }
@@ -113,39 +116,34 @@ impl Mutable for SerdeYaml {
                             }
                         }
                     }
-                    Key::Index(idx) => {
-                        match {
-                            c
-                        } {
-                            &mut SerdeYaml::Sequence(ref mut a) => {
-                                runup_array_or_value(a, idx, i, last_key_index, v)
+                    Key::Index(idx) => match { c } {
+                        &mut SerdeYaml::Sequence(ref mut a) => {
+                            runup_array_or_value(a, idx, i, last_key_index, v)
+                        }
+                        c @ &mut SerdeYaml::String(_)
+                        | c @ &mut SerdeYaml::I64(_)
+                        | c @ &mut SerdeYaml::F64(_)
+                        | c @ &mut SerdeYaml::Bool(_)
+                        | c @ &mut SerdeYaml::Null
+                        | c @ &mut SerdeYaml::Mapping(_) => {
+                            let mut a = Vec::new();
+                            runup_array_or_value(&mut a, idx, i, last_key_index, v);
+                            mem::replace(c, SerdeYaml::Sequence(a));
+                            if i == last_key_index {
+                                return;
                             }
-                            c @ &mut SerdeYaml::String(_) |
-                            c @ &mut SerdeYaml::I64(_) |
-                            c @ &mut SerdeYaml::F64(_) |
-                            c @ &mut SerdeYaml::Bool(_) |
-                            c @ &mut SerdeYaml::Null |
-                            c @ &mut SerdeYaml::Mapping(_) => {
-                                let mut a = Vec::new();
-                                runup_array_or_value(&mut a, idx, i, last_key_index, v);
-                                mem::replace(c, SerdeYaml::Sequence(a));
-                                if i == last_key_index {
-                                    return;
+                            match c {
+                                &mut SerdeYaml::Sequence(ref mut a) => {
+                                    a.get_mut(idx).expect("previous insertion")
                                 }
-                                match c {
-                                    &mut SerdeYaml::Sequence(ref mut a) => {
-                                        a.get_mut(idx).expect("previous insertion")
-                                    }
-                                    _ => unreachable!(),
-                                }
+                                _ => unreachable!(),
                             }
                         }
-                    }
+                    },
                 }
             }
         }
     }
-
 
     fn remove(&mut self, keys: &[Self::Key]) {
         let mut c = self;
@@ -154,9 +152,7 @@ impl Mutable for SerdeYaml {
             c = match *k {
                 Key::String(ref k) => {
                     let k = from_str(&k);
-                    match {
-                        c
-                    } {
+                    match { c } {
                         &mut SerdeYaml::Mapping(ref mut obj) => {
                             if i == last_key_index {
                                 obj.remove(&k);
@@ -171,24 +167,20 @@ impl Mutable for SerdeYaml {
                         _ => return,
                     }
                 }
-                Key::Index(idx) => {
-                    match {
-                        c
-                    } {
-                        &mut SerdeYaml::Sequence(ref mut a) => {
-                            if i == last_key_index {
-                                a.remove(idx);
-                                return;
-                            } else {
-                                match a.get_mut(idx) {
-                                    Some(json) => json,
-                                    None => return,
-                                }
+                Key::Index(idx) => match { c } {
+                    &mut SerdeYaml::Sequence(ref mut a) => {
+                        if i == last_key_index {
+                            a.remove(idx);
+                            return;
+                        } else {
+                            match a.get_mut(idx) {
+                                Some(json) => json,
+                                None => return,
                             }
                         }
-                        _ => return,
                     }
-                }
+                    _ => return,
+                },
             }
         }
     }

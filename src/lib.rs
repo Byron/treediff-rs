@@ -28,7 +28,6 @@ extern crate serde_yaml;
 #[cfg(feature = "with-yaml-rust")]
 extern crate yaml_rust;
 
-
 mod traitdef;
 mod diff;
 pub mod tools;

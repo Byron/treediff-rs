@@ -1,6 +1,5 @@
 extern crate treediff;
 
-
 #[cfg(feature = "with-rustc-serialize")]
 mod diff {
     extern crate rustc_serialize;
@@ -45,11 +44,17 @@ mod diff {
         let v2: Json = r#"{"1": 1, "2": 3}"#.parse().unwrap();
         let mut d = Recorder::default();
         diff(&v1, &v2, &mut d);
-        assert_eq!(d.calls,
-                   vec![Unchanged(vec![k("1")], v1.as_object().unwrap().get("1").unwrap()),
-                        Modified(vec![k("2")],
-                                 v1.as_object().unwrap().get("2").unwrap(),
-                                 v2.as_object().unwrap().get("2").unwrap())]);
+        assert_eq!(
+            d.calls,
+            vec![
+                Unchanged(vec![k("1")], v1.as_object().unwrap().get("1").unwrap()),
+                Modified(
+                    vec![k("2")],
+                    v1.as_object().unwrap().get("2").unwrap(),
+                    v2.as_object().unwrap().get("2").unwrap(),
+                ),
+            ]
+        );
     }
 
     #[test]
@@ -58,8 +63,12 @@ mod diff {
         let v2: Json = r#"{"1": 1}"#.parse().unwrap();
         let mut d = Recorder::default();
         diff(&v1, &v2, &mut d);
-        assert_eq!(d.calls,
-                   vec![Added(vec![k("1")], v2.as_object().unwrap().get("1").unwrap())]);
+        assert_eq!(
+            d.calls,
+            vec![
+                Added(vec![k("1")], v2.as_object().unwrap().get("1").unwrap()),
+            ]
+        );
     }
 
     #[test]
@@ -68,8 +77,12 @@ mod diff {
         let v2: Json = r#"{}"#.parse().unwrap();
         let mut d = Recorder::default();
         diff(&v1, &v2, &mut d);
-        assert_eq!(d.calls,
-                   vec![Removed(vec![k("1")], v1.as_object().unwrap().get("1").unwrap())]);
+        assert_eq!(
+            d.calls,
+            vec![
+                Removed(vec![k("1")], v1.as_object().unwrap().get("1").unwrap()),
+            ]
+        );
     }
 
     #[test]
@@ -78,8 +91,12 @@ mod diff {
         let v2: Json = r#"{"a": {"1": 1}}"#.parse().unwrap();
         let mut d = Recorder::default();
         diff(&v1, &v2, &mut d);
-        assert_eq!(d.calls,
-                   vec![Added(vec![k("a"), k("1")], v2.find_path(&["a", "1"]).unwrap())]);
+        assert_eq!(
+            d.calls,
+            vec![
+                Added(vec![k("a"), k("1")], v2.find_path(&["a", "1"]).unwrap()),
+            ]
+        );
     }
 
     #[test]
@@ -88,8 +105,12 @@ mod diff {
         let v2: Json = r#"{"a": {}}"#.parse().unwrap();
         let mut d = Recorder::default();
         diff(&v1, &v2, &mut d);
-        assert_eq!(d.calls,
-                   vec![Removed(vec![k("a"), k("1")], v1.find_path(&["a", "1"]).unwrap())]);
+        assert_eq!(
+            d.calls,
+            vec![
+                Removed(vec![k("a"), k("1")], v1.find_path(&["a", "1"]).unwrap()),
+            ]
+        );
     }
 
     #[test]
@@ -98,10 +119,16 @@ mod diff {
         let v2: Json = r#"{"a": {"1": 2}}"#.parse().unwrap();
         let mut d = Recorder::default();
         diff(&v1, &v2, &mut d);
-        assert_eq!(d.calls,
-                   vec![Modified(vec![k("a"), k("1")],
-                                 v1.find_path(&["a", "1"]).unwrap(),
-                                 v2.find_path(&["a", "1"]).unwrap())]);
+        assert_eq!(
+            d.calls,
+            vec![
+                Modified(
+                    vec![k("a"), k("1")],
+                    v1.find_path(&["a", "1"]).unwrap(),
+                    v2.find_path(&["a", "1"]).unwrap(),
+                ),
+            ]
+        );
     }
 
     #[test]
