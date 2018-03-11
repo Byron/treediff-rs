@@ -1,3 +1,9 @@
+<a name="v3.0.0"></a>
+### v3.0.0 (2018-03-11)
+
+#### Improvements
+* **upgrade**: use latest versions of dependencies
+
 <a name="v2.5.1"></a>
 ### v2.5.1 (2017-02-22)
 

@@ -12,11 +12,9 @@ impl Value for SerdeYaml {
     type Key = Key;
     fn items<'a>(&'a self) -> Option<Box<Iterator<Item = (Self::Key, &'a Self::Item)> + 'a>> {
         match *self {
-            SerdeYaml::String(_)
-            | SerdeYaml::I64(_)
-            | SerdeYaml::F64(_)
-            | SerdeYaml::Bool(_)
-            | SerdeYaml::Null => None,
+            SerdeYaml::String(_) | SerdeYaml::Number(_) | SerdeYaml::Bool(_) | SerdeYaml::Null => {
+                None
+            }
             SerdeYaml::Sequence(ref inner) => Some(Box::new(
                 inner.iter().enumerate().map(|(i, v)| (Key::Index(i), v)),
             )),
@@ -91,8 +89,7 @@ impl Mutable for SerdeYaml {
                                 }
                             }
                             c @ &mut SerdeYaml::String(_)
-                            | c @ &mut SerdeYaml::I64(_)
-                            | c @ &mut SerdeYaml::F64(_)
+                            | c @ &mut SerdeYaml::Number(_)
                             | c @ &mut SerdeYaml::Bool(_)
                             | c @ &mut SerdeYaml::Null
                             | c @ &mut SerdeYaml::Sequence(_) => {
@@ -121,8 +118,7 @@ impl Mutable for SerdeYaml {
                             runup_array_or_value(a, idx, i, last_key_index, v)
                         }
                         c @ &mut SerdeYaml::String(_)
-                        | c @ &mut SerdeYaml::I64(_)
-                        | c @ &mut SerdeYaml::F64(_)
+                        | c @ &mut SerdeYaml::Number(_)
                         | c @ &mut SerdeYaml::Bool(_)
                         | c @ &mut SerdeYaml::Null
                         | c @ &mut SerdeYaml::Mapping(_) => {
