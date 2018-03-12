@@ -123,7 +123,7 @@ impl<K, V, BF, F> Merger<K, V, BF, F> {
     }
 
     /// Returns a mutable borrow to the `MutableFilter` instance
-    pub fn filter_mut(&mut self) -> &BF {
+    pub fn filter_mut(&mut self) -> &mut BF {
         &mut self.filter
     }
 
