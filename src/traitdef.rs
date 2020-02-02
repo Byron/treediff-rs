@@ -6,7 +6,7 @@ pub trait Value: PartialEq<Self> {
     type Item;
     /// Returns `None` if this is a scalar value, and an iterator yielding (Key, Value) pairs
     /// otherwise. It is entirely possible for it to yield no values though.
-    fn items<'a>(&'a self) -> Option<Box<Iterator<Item = (Self::Key, &'a Self::Item)> + 'a>>;
+    fn items<'a>(&'a self) -> Option<Box<dyn Iterator<Item = (Self::Key, &'a Self::Item)> + 'a>>;
 }
 
 /// The delegate receiving callbacks by the `diff` algorithm, which compares an old to a new value.

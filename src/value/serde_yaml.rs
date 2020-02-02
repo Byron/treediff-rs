@@ -1,5 +1,5 @@
-use traitdef::{Mutable, Value};
 use super::Key;
+use crate::traitdef::{Mutable, Value};
 use serde_yaml::{self, to_string, Mapping, Value as SerdeYaml};
 use std::mem;
 
@@ -10,7 +10,7 @@ fn from_str(s: &str) -> SerdeYaml {
 impl Value for SerdeYaml {
     type Item = SerdeYaml;
     type Key = Key;
-    fn items<'a>(&'a self) -> Option<Box<Iterator<Item = (Self::Key, &'a Self::Item)> + 'a>> {
+    fn items<'a>(&'a self) -> Option<Box<dyn Iterator<Item = (Self::Key, &'a Self::Item)> + 'a>> {
         match *self {
             SerdeYaml::String(_) | SerdeYaml::Number(_) | SerdeYaml::Bool(_) | SerdeYaml::Null => {
                 None

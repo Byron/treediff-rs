@@ -1,8 +1,5 @@
-use traitdef::{Delegate, Mutable};
-use std::fmt::Display;
-use std::borrow::Cow;
-use std::borrow::BorrowMut;
-use std::marker::PhantomData;
+use crate::traitdef::{Delegate, Mutable};
+use std::{borrow::BorrowMut, borrow::Cow, fmt::Display, marker::PhantomData};
 
 /// A `Delegate` which applies differences to a target object.
 ///
@@ -89,7 +86,8 @@ where
     }
     fn removed<'b>(&mut self, k: &'b K, v: &'a V) {
         let keys = appended(&self.cursor, Some(k));
-        match self.filter
+        match self
+            .filter
             .borrow_mut()
             .resolve_removal(&keys, v, &mut self.inner)
         {
@@ -105,7 +103,8 @@ where
     }
     fn modified<'b>(&mut self, old: &'a V, new: &'a V) {
         let keys = appended(&self.cursor, None);
-        match self.filter
+        match self
+            .filter
             .borrow_mut()
             .resolve_conflict(&keys, old, new, &mut self.inner)
         {

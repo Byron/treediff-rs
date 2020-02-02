@@ -3,11 +3,11 @@ extern crate treediff;
 #[cfg(feature = "with-rustc-serialize")]
 mod diff {
     extern crate rustc_serialize;
-    use treediff::diff;
-    use treediff::tools::Recorder;
-    use treediff::tools::ChangeType::*;
-    use treediff::value::Key;
     use self::rustc_serialize::json::Json;
+    use treediff::diff;
+    use treediff::tools::ChangeType::*;
+    use treediff::tools::Recorder;
+    use treediff::value::Key;
 
     fn k(s: &'static str) -> Key {
         Key::String(s.into())
@@ -65,9 +65,10 @@ mod diff {
         diff(&v1, &v2, &mut d);
         assert_eq!(
             d.calls,
-            vec![
-                Added(vec![k("1")], v2.as_object().unwrap().get("1").unwrap()),
-            ]
+            vec![Added(
+                vec![k("1")],
+                v2.as_object().unwrap().get("1").unwrap()
+            ),]
         );
     }
 
@@ -79,9 +80,10 @@ mod diff {
         diff(&v1, &v2, &mut d);
         assert_eq!(
             d.calls,
-            vec![
-                Removed(vec![k("1")], v1.as_object().unwrap().get("1").unwrap()),
-            ]
+            vec![Removed(
+                vec![k("1")],
+                v1.as_object().unwrap().get("1").unwrap()
+            ),]
         );
     }
 
@@ -93,9 +95,10 @@ mod diff {
         diff(&v1, &v2, &mut d);
         assert_eq!(
             d.calls,
-            vec![
-                Added(vec![k("a"), k("1")], v2.find_path(&["a", "1"]).unwrap()),
-            ]
+            vec![Added(
+                vec![k("a"), k("1")],
+                v2.find_path(&["a", "1"]).unwrap()
+            ),]
         );
     }
 
@@ -107,9 +110,10 @@ mod diff {
         diff(&v1, &v2, &mut d);
         assert_eq!(
             d.calls,
-            vec![
-                Removed(vec![k("a"), k("1")], v1.find_path(&["a", "1"]).unwrap()),
-            ]
+            vec![Removed(
+                vec![k("a"), k("1")],
+                v1.find_path(&["a", "1"]).unwrap()
+            ),]
         );
     }
 
@@ -121,13 +125,11 @@ mod diff {
         diff(&v1, &v2, &mut d);
         assert_eq!(
             d.calls,
-            vec![
-                Modified(
-                    vec![k("a"), k("1")],
-                    v1.find_path(&["a", "1"]).unwrap(),
-                    v2.find_path(&["a", "1"]).unwrap(),
-                ),
-            ]
+            vec![Modified(
+                vec![k("a"), k("1")],
+                v1.find_path(&["a", "1"]).unwrap(),
+                v2.find_path(&["a", "1"]).unwrap(),
+            ),]
         );
     }
 

@@ -1,13 +1,12 @@
-use traitdef::{Mutable, Value};
-use rustc_serialize::json::{Json as RustcJson, Object};
-use std::mem;
-use std::collections::btree_map::Entry::*;
 use super::Key;
+use crate::traitdef::{Mutable, Value};
+use rustc_serialize::json::{Json as RustcJson, Object};
+use std::{collections::btree_map::Entry::*, mem};
 
 impl Value for RustcJson {
     type Item = RustcJson;
     type Key = Key;
-    fn items<'a>(&'a self) -> Option<Box<Iterator<Item = (Self::Key, &'a Self::Item)> + 'a>> {
+    fn items<'a>(&'a self) -> Option<Box<dyn Iterator<Item = (Self::Key, &'a Self::Item)> + 'a>> {
         match *self {
             RustcJson::String(_)
             | RustcJson::U64(_)

@@ -1,40 +1,48 @@
 extern crate treediff;
 
 macro_rules! make_suite {
-($bool:expr) => {
-    use treediff::Value;
-    use treediff::value::Key;
+    ($bool:expr) => {
+        use treediff::value::Key;
+        use treediff::Value;
 
-    #[test]
-    fn scalar_values() {
-        for v in &["null", "true", "1.23", "-1234456", "1234456", "\"string\""] {
-            let j = make(v);
-            assert!(j.items().is_none());
+        #[test]
+        fn scalar_values() {
+            for v in &["null", "true", "1.23", "-1234456", "1234456", "\"string\""] {
+                let j = make(v);
+                assert!(j.items().is_none());
+            }
         }
-    }
 
-    #[test]
-    fn array() {
-        let j = make(r#"[null, true]"#);
-        assert_eq!(j.items().unwrap().collect::<Vec<_>>(),
-                   vec![(Key::Index(0), &ValueType::Null),
-                        (Key::Index(1), &$bool(true))]);
-    }
+        #[test]
+        fn array() {
+            let j = make(r#"[null, true]"#);
+            assert_eq!(
+                j.items().unwrap().collect::<Vec<_>>(),
+                vec![
+                    (Key::Index(0), &ValueType::Null),
+                    (Key::Index(1), &$bool(true))
+                ]
+            );
+        }
 
-    #[test]
-    fn object() {
-        let j = make(r#"{"a": null, "b": true}"#);
-        assert_eq!(j.items().unwrap().collect::<Vec<_>>(),
-                   vec![(Key::String("a".into()), &ValueType::Null),
-                        (Key::String("b".into()), &$bool(true))]);
-    }
+        #[test]
+        fn object() {
+            let j = make(r#"{"a": null, "b": true}"#);
+            assert_eq!(
+                j.items().unwrap().collect::<Vec<_>>(),
+                vec![
+                    (Key::String("a".into()), &ValueType::Null),
+                    (Key::String("b".into()), &$bool(true))
+                ]
+            );
+        }
 
-    #[test]
-    fn empty_object() {
-        let j = make(r#"{}"#);
-        assert_eq!(j.items().unwrap().collect::<Vec<_>>(), vec![]);
-    }
-};
+        #[test]
+        fn empty_object() {
+            let j = make(r#"{}"#);
+            assert_eq!(j.items().unwrap().collect::<Vec<_>>(), vec![]);
+        }
+    };
 }
 
 #[cfg(feature = "with-yaml-rust")]

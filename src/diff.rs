@@ -1,6 +1,5 @@
-use traitdef::{Delegate, Value};
-use std::cmp::Ordering;
-use std::collections::BTreeSet;
+use crate::traitdef::{Delegate, Value};
+use std::{cmp::Ordering, collections::BTreeSet};
 
 /// A generic diff algorithm suitable for `Value` types as seen in serialization/deserialization
 /// libraries.
@@ -58,11 +57,7 @@ impl<'a, K, V> From<(K, &'a V)> for OrdByKey<'a, K, V> {
     }
 }
 
-impl<'a, K, V> Eq for OrdByKey<'a, K, V>
-where
-    K: Eq + PartialOrd,
-{
-}
+impl<'a, K, V> Eq for OrdByKey<'a, K, V> where K: Eq + PartialOrd {}
 
 impl<'a, K, V> PartialEq for OrdByKey<'a, K, V>
 where

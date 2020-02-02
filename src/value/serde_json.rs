@@ -1,12 +1,12 @@
-use traitdef::{Mutable, Value};
 use super::Key;
+use crate::traitdef::{Mutable, Value};
 use serde_json::{map, Map, Value as SerdeJson};
 use std::mem;
 
 impl Value for SerdeJson {
     type Item = SerdeJson;
     type Key = Key;
-    fn items<'a>(&'a self) -> Option<Box<Iterator<Item = (Self::Key, &'a Self::Item)> + 'a>> {
+    fn items<'a>(&'a self) -> Option<Box<dyn Iterator<Item = (Self::Key, &'a Self::Item)> + 'a>> {
         match *self {
             SerdeJson::String(_) | SerdeJson::Number(_) | SerdeJson::Bool(_) | SerdeJson::Null => {
                 None

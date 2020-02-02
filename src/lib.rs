@@ -18,20 +18,12 @@
 //! [`merge`]: tools/struct.Merger.html
 //! [diff-tests]: https://github.com/Byron/treediff-rs/blob/master/tests/diff.rs
 //! [merge-tests]: https://github.com/Byron/treediff-rs/blob/master/tests/merge.rs
-#![deny(missing_docs)]
-#[cfg(feature = "with-rustc-serialize")]
-extern crate rustc_serialize;
-#[cfg(feature = "with-serde-json")]
-extern crate serde_json;
-#[cfg(feature = "with-serde-yaml")]
-extern crate serde_yaml;
-#[cfg(feature = "with-yaml-rust")]
-extern crate yaml_rust;
+#![deny(missing_docs, unsafe_code)]
 
-mod traitdef;
 mod diff;
 pub mod tools;
+mod traitdef;
 pub mod value;
 
-pub use traitdef::*;
 pub use diff::*;
+pub use traitdef::*;
