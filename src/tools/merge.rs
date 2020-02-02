@@ -20,11 +20,11 @@ pub struct Merger<K, V, BF, F> {
     _d: PhantomData<F>,
 }
 
-fn appended<'b, K>(keys: &Vec<K>, k: Option<&'b K>) -> Vec<K>
+fn appended<K>(keys: &[K], k: Option<&K>) -> Vec<K>
 where
     K: Clone,
 {
-    let mut keys = keys.clone();
+    let mut keys = Vec::from(keys);
     if let Some(k) = k {
         keys.push(k.clone());
     }
@@ -41,13 +41,13 @@ pub trait MutableFilter {
     /// be removed, or any Value to be set in its place.
     ///
     /// `old` is the previous value at the given `keys` path, and `new` is the one now at its place.
-    /// `_self` provides access to the target of the merge operation.
+    /// `_target` provides access to the target of the merge operation.
     fn resolve_conflict<'a, K: Clone + Display, V: Clone>(
         &mut self,
         _keys: &[K],
         _old: &'a V,
         new: &'a V,
-        _self: &mut V,
+        _target: &mut V,
     ) -> Option<Cow<'a, V>> {
         Some(Cow::Borrowed(new))
     }
@@ -55,11 +55,12 @@ pub trait MutableFilter {
     /// to be removed, or any Value to be set in its place instead.
     ///
     /// `removed` is the Value which is to be removed.
+    /// `_target` provides access to the target of the merge operation.
     fn resolve_removal<'a, K: Clone + Display, V: Clone>(
         &mut self,
         _keys: &[K],
         _removed: &'a V,
-        _self: &mut V,
+        _target: &mut V,
     ) -> Option<Cow<'a, V>> {
         None
     }
@@ -78,7 +79,7 @@ where
     F: MutableFilter,
     BF: BorrowMut<F>,
 {
-    fn push<'b>(&mut self, k: &'b K) {
+    fn push(&mut self, k: &K) {
         self.cursor.push(k.clone());
     }
     fn pop(&mut self) {

@@ -8,8 +8,8 @@ fn from_str(s: &str) -> SerdeYaml {
 }
 
 impl Value for SerdeYaml {
-    type Item = SerdeYaml;
     type Key = Key;
+    type Item = SerdeYaml;
     fn items<'a>(&'a self) -> Option<Box<dyn Iterator<Item = (Self::Key, &'a Self::Item)> + 'a>> {
         match *self {
             SerdeYaml::String(_) | SerdeYaml::Number(_) | SerdeYaml::Bool(_) | SerdeYaml::Null => {

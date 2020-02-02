@@ -39,11 +39,11 @@ impl<'a, K, V> Default for Recorder<'a, K, V> {
     }
 }
 
-fn mk<'b, K>(c: &Vec<K>, k: Option<&'b K>) -> Vec<K>
+fn mk<K>(c: &[K], k: Option<&K>) -> Vec<K>
 where
     K: Clone,
 {
-    let mut c = c.clone();
+    let mut c = Vec::from(c);
     match k {
         Some(k) => {
             c.push(k.clone());
@@ -57,7 +57,7 @@ impl<'a, K, V> Delegate<'a, K, V> for Recorder<'a, K, V>
 where
     K: Clone,
 {
-    fn push<'b>(&mut self, k: &'b K) {
+    fn push(&mut self, k: &K) {
         self.cursor.push(k.clone())
     }
     fn pop(&mut self) {

@@ -4,8 +4,8 @@ use rustc_serialize::json::{Json as RustcJson, Object};
 use std::{collections::btree_map::Entry::*, mem};
 
 impl Value for RustcJson {
-    type Item = RustcJson;
     type Key = Key;
+    type Item = RustcJson;
     fn items<'a>(&'a self) -> Option<Box<dyn Iterator<Item = (Self::Key, &'a Self::Item)> + 'a>> {
         match *self {
             RustcJson::String(_)

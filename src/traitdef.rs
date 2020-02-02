@@ -6,6 +6,7 @@ pub trait Value: PartialEq<Self> {
     type Item;
     /// Returns `None` if this is a scalar value, and an iterator yielding (Key, Value) pairs
     /// otherwise. It is entirely possible for it to yield no values though.
+    #[allow(clippy::type_complexity)]
     fn items<'a>(&'a self) -> Option<Box<dyn Iterator<Item = (Self::Key, &'a Self::Item)> + 'a>>;
 }
 
@@ -35,10 +36,10 @@ pub trait Delegate<'a, K, V> {
     /// received via `push(...)`
     fn added<'b>(&mut self, _k: &'b K, _v: &'a V) {}
     /// The Value `v` was not changed.
-    fn unchanged<'b>(&mut self, _v: &'a V) {}
+    fn unchanged(&mut self, _v: &'a V) {}
 
     /// ... the `old` Value was modified, and is now the `new` Value.
-    fn modified<'b>(&mut self, _old: &'a V, _new: &'a V) {}
+    fn modified(&mut self, _old: &'a V, _new: &'a V) {}
 }
 
 /// A trait to allow changing any `Value`.

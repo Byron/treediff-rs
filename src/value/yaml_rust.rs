@@ -6,8 +6,9 @@ use yaml_rust::{yaml::Hash, Yaml, YamlEmitter, YamlLoader};
 fn from_str(s: &str) -> Yaml {
     let mut v = YamlLoader::load_from_str(s)
         .expect("valid yaml value - we serialized it beforehand after all");
-    assert!(
-        v.len() == 1,
+    assert_eq!(
+        v.len(),
+        1,
         "need exactly one document - multi-document keys are just not possible"
     );
     v.pop().unwrap()
@@ -22,8 +23,8 @@ fn to_string(v: &Yaml) -> String {
 }
 
 impl Value for Yaml {
-    type Item = Yaml;
     type Key = Key;
+    type Item = Yaml;
     fn items<'a>(&'a self) -> Option<Box<dyn Iterator<Item = (Self::Key, &'a Self::Item)> + 'a>> {
         match *self {
             Yaml::String(_)
