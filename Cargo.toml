@@ -10,12 +10,12 @@ readme = "README.md"
 include = ["src/**/*.rs", "Cargo.toml"]
 repository = "https://github.com/Byron/treediff-rs"
 edition = "2018"
-version = "3.0.3-alpha.0"
+version = "4.0.0"
 
 [dependencies]
-rustc-serialize = {version = "0.3.22", optional = true}
-serde_json = {version = "1.0.2", optional = true}
-serde_yaml = {version = "0.7", optional = true}
+rustc-serialize = {version = "0.3.24", optional = true}
+serde_json = {version = "1.0.45", optional = true}
+serde_yaml = {version = "0.8", optional = true}
 yaml-rust = {version = "0.4", optional = true}
 
 [features]
