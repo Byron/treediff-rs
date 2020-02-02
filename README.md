@@ -12,9 +12,3 @@ Add this to your Cargo.toml
 [dependencies]
 treediff = "*"
 ```
-
-Add this to your lib ...
-```Rust
-extern crate treediff;
-```
-

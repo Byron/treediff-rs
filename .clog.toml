@@ -1,6 +1,0 @@
-[clog]
-repository = "https://github.com/Byron/treediff-rs"
-from-latest-tag = true
-
-[sections]
-Improvements = ["imp"]

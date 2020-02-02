@@ -6,6 +6,8 @@ keywords = ["diff", "structure", "tree", "arbitrary", "general"]
 categories = ["algorithms"]
 license = "MIT/Apache-2.0"
 name = "treediff"
+readme = "README.md"
+include = ["src/**/*.rs", "Cargo.toml"]
 repository = "https://github.com/Byron/treediff-rs"
 version = "3.0.1"
 
