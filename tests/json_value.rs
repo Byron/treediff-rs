@@ -66,7 +66,46 @@ mod serde_yaml {
         from_str(v).unwrap()
     }
 
-    make_suite!(ValueType::Bool);
+    use treediff::value::Key;
+    use treediff::Value;
+
+    #[test]
+    fn scalar_values() {
+        for v in &["null", "true", "1.23", "-1234456", "1234456", "\"string\""] {
+            let j = make(v);
+            assert!(j.items().is_none());
+        }
+    }
+
+    #[test]
+    fn array() {
+        let j = make(r#"[null, true]"#);
+        assert_eq!(
+            j.items().unwrap().collect::<Vec<_>>(),
+            vec![
+                (Key::Index(0), &ValueType::Null),
+                (Key::Index(1), &ValueType::Bool(true))
+            ]
+        );
+    }
+
+    #[test]
+    fn object() {
+        let j = make(r#"{"a": null, "b": true}"#);
+        assert_eq!(
+            j.items().unwrap().collect::<Vec<_>>(),
+            vec![
+                (Key::String("a\n".into()), &ValueType::Null),
+                (Key::String("b\n".into()), &ValueType::Bool(true))
+            ]
+        );
+    }
+
+    #[test]
+    fn empty_object() {
+        let j = make(r#"{}"#);
+        assert_eq!(j.items().unwrap().collect::<Vec<_>>(), vec![]);
+    }
 }
 
 #[cfg(feature = "with-serde-json")]
