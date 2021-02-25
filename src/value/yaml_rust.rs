@@ -49,7 +49,7 @@ impl Mutable for Yaml {
     type Item = Yaml;
 
     fn set(&mut self, keys: &[Self::Key], v: &Self::Item) {
-        if keys.len() == 0 {
+        if keys.is_empty() {
             *self = v.clone();
         } else {
             let mut c = self;
@@ -109,19 +109,19 @@ impl Mutable for Yaml {
                             | c @ &mut Yaml::Alias(_)
                             | c @ &mut Yaml::BadValue
                             | c @ &mut Yaml::Array(_) => {
-                                mem::replace(
+                                drop(mem::replace(
                                     c,
                                     Yaml::Hash({
                                         let mut o = Hash::new();
                                         o.insert(k.clone(), object_or_value(i));
                                         o
                                     }),
-                                );
+                                ));
                                 if i == last_key_index {
                                     return;
                                 }
                                 match c {
-                                    &mut Yaml::Hash(ref mut obj) => {
+                                    Yaml::Hash(ref mut obj) => {
                                         obj.get_mut(&k).expect("previous insertion")
                                     }
                                     _ => unreachable!(),
@@ -143,12 +143,12 @@ impl Mutable for Yaml {
                         | c @ &mut Yaml::Hash(_) => {
                             let mut a = Vec::new();
                             runup_array_or_value(&mut a, idx, i, last_key_index, v);
-                            mem::replace(c, Yaml::Array(a));
+                            drop(mem::replace(c, Yaml::Array(a)));
                             if i == last_key_index {
                                 return;
                             }
                             match c {
-                                &mut Yaml::Array(ref mut a) => {
+                                Yaml::Array(ref mut a) => {
                                     a.get_mut(idx).expect("previous insertion")
                                 }
                                 _ => unreachable!(),
@@ -168,7 +168,7 @@ impl Mutable for Yaml {
                 Key::String(ref k) => {
                     let k = from_str(&k);
                     match { c } {
-                        &mut Yaml::Hash(ref mut obj) => {
+                        Yaml::Hash(ref mut obj) => {
                             if i == last_key_index {
                                 obj.remove(&k);
                                 return;
@@ -183,7 +183,7 @@ impl Mutable for Yaml {
                     }
                 }
                 Key::Index(idx) => match { c } {
-                    &mut Yaml::Array(ref mut a) => {
+                    Yaml::Array(ref mut a) => {
                         if i == last_key_index {
                             a.remove(idx);
                             return;

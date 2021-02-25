@@ -18,6 +18,9 @@ serde_json = {version = "1.0.45", optional = true}
 serde_yaml = {version = "0.8", optional = true}
 yaml-rust = {version = "0.4", optional = true}
 
+[dev-dependencies]
+serde = { version = "1.0", features = ["derive"] }
+
 [features]
 with-rustc-serialize = ["rustc-serialize"]
 with-serde-json = ["serde_json"]

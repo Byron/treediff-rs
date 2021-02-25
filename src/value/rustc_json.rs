@@ -29,7 +29,7 @@ impl Mutable for RustcJson {
     type Item = RustcJson;
 
     fn set(&mut self, keys: &[Self::Key], v: &Self::Item) {
-        if keys.len() == 0 {
+        if keys.is_empty() {
             *self = v.clone();
         } else {
             let mut c = self;
@@ -84,19 +84,19 @@ impl Mutable for RustcJson {
                         | c @ &mut RustcJson::U64(_)
                         | c @ &mut RustcJson::Array(_)
                         | c @ &mut RustcJson::I64(_) => {
-                            mem::replace(
+                            drop(mem::replace(
                                 c,
                                 RustcJson::Object({
                                     let mut o = Object::new();
                                     o.insert(k.clone(), object_or_value(i));
                                     o
                                 }),
-                            );
+                            ));
                             if i == last_key_index {
                                 return;
                             }
                             match c {
-                                &mut RustcJson::Object(ref mut obj) => {
+                                RustcJson::Object(ref mut obj) => {
                                     obj.get_mut(k).expect("previous insertion")
                                 }
                                 _ => unreachable!(),
@@ -116,12 +116,12 @@ impl Mutable for RustcJson {
                         | c @ &mut RustcJson::I64(_) => {
                             let mut a = Vec::new();
                             runup_array_or_value(&mut a, idx, i, last_key_index, v);
-                            mem::replace(c, RustcJson::Array(a));
+                            drop(mem::replace(c, RustcJson::Array(a)));
                             if i == last_key_index {
                                 return;
                             }
                             match c {
-                                &mut RustcJson::Array(ref mut a) => {
+                                RustcJson::Array(ref mut a) => {
                                     a.get_mut(idx).expect("previous insertion")
                                 }
                                 _ => unreachable!(),
@@ -139,7 +139,7 @@ impl Mutable for RustcJson {
         for (i, k) in keys.iter().enumerate() {
             c = match *k {
                 Key::String(ref k) => match { c } {
-                    &mut RustcJson::Object(ref mut obj) => {
+                    RustcJson::Object(ref mut obj) => {
                         if i == last_key_index {
                             obj.remove(k);
                             return;
@@ -153,7 +153,7 @@ impl Mutable for RustcJson {
                     _ => return,
                 },
                 Key::Index(idx) => match { c } {
-                    &mut RustcJson::Array(ref mut a) => {
+                    RustcJson::Array(ref mut a) => {
                         if i == last_key_index {
                             a.remove(idx);
                             return;

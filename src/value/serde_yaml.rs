@@ -36,7 +36,7 @@ impl Mutable for SerdeYaml {
     type Item = SerdeYaml;
 
     fn set(&mut self, keys: &[Self::Key], v: &Self::Item) {
-        if keys.len() == 0 {
+        if keys.is_empty() {
             *self = v.clone();
         } else {
             let mut c = self;
@@ -93,19 +93,19 @@ impl Mutable for SerdeYaml {
                             | c @ &mut SerdeYaml::Bool(_)
                             | c @ &mut SerdeYaml::Null
                             | c @ &mut SerdeYaml::Sequence(_) => {
-                                mem::replace(
+                                drop(mem::replace(
                                     c,
                                     SerdeYaml::Mapping({
                                         let mut o = Mapping::new();
                                         o.insert(k.clone(), object_or_value(i));
                                         o
                                     }),
-                                );
+                                ));
                                 if i == last_key_index {
                                     return;
                                 }
                                 match c {
-                                    &mut SerdeYaml::Mapping(ref mut obj) => {
+                                    SerdeYaml::Mapping(ref mut obj) => {
                                         obj.get_mut(&k).expect("previous insertion")
                                     }
                                     _ => unreachable!(),
@@ -124,12 +124,12 @@ impl Mutable for SerdeYaml {
                         | c @ &mut SerdeYaml::Mapping(_) => {
                             let mut a = Vec::new();
                             runup_array_or_value(&mut a, idx, i, last_key_index, v);
-                            mem::replace(c, SerdeYaml::Sequence(a));
+                            drop(mem::replace(c, SerdeYaml::Sequence(a)));
                             if i == last_key_index {
                                 return;
                             }
                             match c {
-                                &mut SerdeYaml::Sequence(ref mut a) => {
+                                SerdeYaml::Sequence(ref mut a) => {
                                     a.get_mut(idx).expect("previous insertion")
                                 }
                                 _ => unreachable!(),
@@ -149,7 +149,7 @@ impl Mutable for SerdeYaml {
                 Key::String(ref k) => {
                     let k = from_str(&k);
                     match { c } {
-                        &mut SerdeYaml::Mapping(ref mut obj) => {
+                        SerdeYaml::Mapping(ref mut obj) => {
                             if i == last_key_index {
                                 obj.remove(&k);
                                 return;
@@ -164,7 +164,7 @@ impl Mutable for SerdeYaml {
                     }
                 }
                 Key::Index(idx) => match { c } {
-                    &mut SerdeYaml::Sequence(ref mut a) => {
+                    SerdeYaml::Sequence(ref mut a) => {
                         if i == last_key_index {
                             a.remove(idx);
                             return;

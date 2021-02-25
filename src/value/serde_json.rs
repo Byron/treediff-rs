@@ -26,7 +26,7 @@ impl Mutable for SerdeJson {
     type Item = SerdeJson;
 
     fn set(&mut self, keys: &[Self::Key], v: &Self::Item) {
-        if keys.len() == 0 {
+        if keys.is_empty() {
             *self = v.clone();
         } else {
             let mut c = self;
@@ -79,19 +79,19 @@ impl Mutable for SerdeJson {
                         | c @ &mut SerdeJson::Bool(_)
                         | c @ &mut SerdeJson::Null
                         | c @ &mut SerdeJson::Array(_) => {
-                            mem::replace(
+                            drop(mem::replace(
                                 c,
                                 SerdeJson::Object({
                                     let mut o = Map::new();
                                     o.insert(k.clone(), object_or_value(i));
                                     o
                                 }),
-                            );
+                            ));
                             if i == last_key_index {
                                 return;
                             }
                             match c {
-                                &mut SerdeJson::Object(ref mut obj) => {
+                                SerdeJson::Object(ref mut obj) => {
                                     obj.get_mut(k).expect("previous insertion")
                                 }
                                 _ => unreachable!(),
@@ -109,12 +109,12 @@ impl Mutable for SerdeJson {
                         | c @ &mut SerdeJson::Object(_) => {
                             let mut a = Vec::new();
                             runup_array_or_value(&mut a, idx, i, last_key_index, v);
-                            mem::replace(c, SerdeJson::Array(a));
+                            drop(mem::replace(c, SerdeJson::Array(a)));
                             if i == last_key_index {
                                 return;
                             }
                             match c {
-                                &mut SerdeJson::Array(ref mut a) => {
+                                SerdeJson::Array(ref mut a) => {
                                     a.get_mut(idx).expect("previous insertion")
                                 }
                                 _ => unreachable!(),
@@ -132,7 +132,7 @@ impl Mutable for SerdeJson {
         for (i, k) in keys.iter().enumerate() {
             c = match *k {
                 Key::String(ref k) => match { c } {
-                    &mut SerdeJson::Object(ref mut obj) => {
+                    SerdeJson::Object(ref mut obj) => {
                         if i == last_key_index {
                             obj.remove(k);
                             return;
@@ -146,7 +146,7 @@ impl Mutable for SerdeJson {
                     _ => return,
                 },
                 Key::Index(idx) => match { c } {
-                    &mut SerdeJson::Array(ref mut a) => {
+                    SerdeJson::Array(ref mut a) => {
                         if i == last_key_index {
                             a.remove(idx);
                             return;

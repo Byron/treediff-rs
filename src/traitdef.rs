@@ -22,7 +22,7 @@ pub trait Delegate<'a, K, V> {
     ///
     /// Delegates should memoize the current Key path to be able to compute
     /// the full Key path when needed.
-    fn push<'b>(&mut self, _k: &'b K) {}
+    fn push(&mut self, _k: &K) {}
     /// ... we have processed all items and leave the object previously `push`ed.
     fn pop(&mut self) {}
     /// ... the Value `v` at the given Key `k` should be removed.
