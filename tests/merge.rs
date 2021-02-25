@@ -140,6 +140,14 @@ macro_rules! make_suite {
             let mut m = Merger::<_, _, _, Filter>::with_filter(ValueType::clone(&v1), &mut f);
             diff(&v1, &v2, &mut m);
             assert_eq!(v3, *m.as_ref());
+
+            let v1 = make(r#"[{"b" : "old", "c": "old"}]"#);
+            let v2 = make(r#"[{"c" : "new"}]"#);
+            let v3 = make(r#"[{"b" : "old", "c" : "new"}]"#);
+            let mut f = Filter;
+            let mut m = Merger::<_, _, _, Filter>::with_filter(ValueType::clone(&v1), &mut f);
+            diff(&v1, &v2, &mut m);
+            assert_eq!(v3, *m.as_ref());
         }
 
         #[test]
