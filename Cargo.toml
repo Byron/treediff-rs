@@ -9,7 +9,7 @@ name = "treediff"
 readme = "README.md"
 repository = "https://github.com/Byron/treediff-rs"
 edition = "2018"
-version = "4.0.1-alpha.0"
+version = "4.0.1"
 include = ["src/**/*", "LICENSE-*", "README.md", "changelog.md"]
 
 [dependencies]
