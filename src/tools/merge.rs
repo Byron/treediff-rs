@@ -12,6 +12,7 @@ use std::{borrow::BorrowMut, borrow::Cow, fmt::Display, marker::PhantomData};
 ///
 /// # Examples
 /// Please see the [tests][tests] for usage examples.
+///
 /// [tests]: https://github.com/Byron/treediff-rs/blob/master/tests/merge.rs#L22
 pub struct Merger<K, V, BF, F> {
     cursor: Vec<K>,

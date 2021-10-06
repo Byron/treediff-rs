@@ -22,6 +22,7 @@ pub enum ChangeType<'a, K, V: 'a> {
 ///
 /// # Examples
 /// Please see the [tests][tests] for how to use this type.
+///
 /// [tests]: https://github.com/Byron/treediff-rs/blob/master/tests/diff.rs#L21
 #[derive(Debug, PartialEq)]
 pub struct Recorder<'a, K, V: 'a> {
