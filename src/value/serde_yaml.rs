@@ -12,16 +12,19 @@ impl Value for SerdeYaml {
     type Item = SerdeYaml;
     fn items<'a>(&'a self) -> Option<Box<dyn Iterator<Item = (Self::Key, &'a Self::Item)> + 'a>> {
         match *self {
-            SerdeYaml::String(_) | SerdeYaml::Number(_) | SerdeYaml::Bool(_) | SerdeYaml::Null => {
-                None
-            }
+            SerdeYaml::String(_)
+            | SerdeYaml::Number(_)
+            | SerdeYaml::Bool(_)
+            | SerdeYaml::Null
+            | SerdeYaml::Tagged(_) => None,
             SerdeYaml::Sequence(ref inner) => Some(Box::new(
                 inner.iter().enumerate().map(|(i, v)| (Key::Index(i), v)),
             )),
             SerdeYaml::Mapping(ref inner) => Some(Box::new(inner.iter().map(|(k, v)| {
                 (
                     Key::String(
-                        to_string(k).expect("yaml value to serialize into yaml correctly")[4..]
+                        to_string(k)
+                            .expect("yaml value to serialize into yaml correctly")
                             .to_owned(),
                     ),
                     v,
@@ -69,7 +72,7 @@ impl Mutable for SerdeYaml {
                     array[target_index] = value;
                 }
                 &mut array[target_index]
-            };
+            }
             for (i, k) in keys.iter().enumerate() {
                 c = match *k {
                     Key::String(ref k) => {
@@ -92,7 +95,8 @@ impl Mutable for SerdeYaml {
                             | c @ &mut SerdeYaml::Number(_)
                             | c @ &mut SerdeYaml::Bool(_)
                             | c @ &mut SerdeYaml::Null
-                            | c @ &mut SerdeYaml::Sequence(_) => {
+                            | c @ &mut SerdeYaml::Sequence(_)
+                            | c @ &mut SerdeYaml::Tagged(_) => {
                                 drop(mem::replace(
                                     c,
                                     SerdeYaml::Mapping({
@@ -121,7 +125,8 @@ impl Mutable for SerdeYaml {
                         | c @ &mut SerdeYaml::Number(_)
                         | c @ &mut SerdeYaml::Bool(_)
                         | c @ &mut SerdeYaml::Null
-                        | c @ &mut SerdeYaml::Mapping(_) => {
+                        | c @ &mut SerdeYaml::Mapping(_)
+                        | c @ &mut SerdeYaml::Tagged(_) => {
                             let mut a = Vec::new();
                             runup_array_or_value(&mut a, idx, i, last_key_index, v);
                             drop(mem::replace(c, SerdeYaml::Sequence(a)));
