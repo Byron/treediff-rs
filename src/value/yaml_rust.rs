@@ -82,7 +82,7 @@ impl Mutable for Yaml {
                     array[target_index] = value;
                 }
                 &mut array[target_index]
-            };
+            }
             for (i, k) in keys.iter().enumerate() {
                 c = match *k {
                     Key::String(ref k) => {

@@ -15,7 +15,7 @@ include = ["src/**/*", "LICENSE-*", "README.md", "CHANGELOG.md"]
 [dependencies]
 rustc-serialize = {version = "0.3.24", optional = true}
 serde_json = {version = "1.0.45", optional = true}
-serde_yaml = {version = "0.8", optional = true}
+serde_yaml = {version = "0.9", optional = true}
 yaml-rust = {version = "0.4", optional = true}
 
 [dev-dependencies]
@@ -26,4 +26,3 @@ with-rustc-serialize = ["rustc-serialize"]
 with-serde-json = ["serde_json"]
 with-serde-yaml = ["serde_yaml"]
 with-yaml-rust = ["yaml-rust"]
-
