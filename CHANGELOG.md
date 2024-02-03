@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 4.0.3 (2024-02-03)
 
 This release updates serde-yaml to v0.9.
 
@@ -13,7 +13,7 @@ This release updates serde-yaml to v0.9.
 
 <csr-read-only-do-not-edit/>
 
- - 2 commits contributed to the release over the course of 1 calendar day.
+ - 3 commits contributed to the release over the course of 1 calendar day.
  - 847 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -25,6 +25,7 @@ This release updates serde-yaml to v0.9.
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Prepare changelog prior to release ([`d61b90c`](https://github.com/byron/treediff-rs/commit/d61b90ca0dfce93d5c58567ed029ac7c319b0c8a))
     - Merge pull request #13 from glehmann/serde-yaml-09 ([`d480652`](https://github.com/byron/treediff-rs/commit/d480652f79a9853340dfdfed462b195400a4255f))
     - Update serde_yaml to 0.9 ([`3177d4a`](https://github.com/byron/treediff-rs/commit/3177d4a6fc8226fa3fdfef656f934db0b75db541))
 </details>
@@ -201,6 +202,8 @@ This release updates serde-yaml to v0.9.
 
 ## v2.5.1 (2017-02-22)
 
+<csr-id-6092375279e6fe184c8b457f0e6eb5a9f7f05d3b/>
+
 ### Other
 
  - <csr-id-6092375279e6fe184c8b457f0e6eb5a9f7f05d3b/> use serde 0.9.8 and Map::Entry
@@ -228,6 +231,8 @@ This release updates serde-yaml to v0.9.
 
 ## v2.5.0 (2017-02-14)
 
+<csr-id-75fae1b2c30b9ce42012f1c9d63118e0443b9b6f/>
+
 ### Other
 
  - <csr-id-75fae1b2c30b9ce42012f1c9d63118e0443b9b6f/> allow keys to be cloned and displayed
@@ -253,6 +258,9 @@ This release updates serde-yaml to v0.9.
 </details>
 
 ## v2.4.0 (2017-02-14)
+
+<csr-id-eeb3a2da52c22d7e820fe3a40c74e55a2431ff9e/>
+<csr-id-fc210ea42354be6e8febcd210bd9630040bd357d/>
 
 ### Other
 
@@ -284,6 +292,9 @@ This release updates serde-yaml to v0.9.
 </details>
 
 ## v2.3.0 (2017-02-13)
+
+<csr-id-07eff4f93816bc10d4b0d5d98bcaef03741ee2c0/>
+<csr-id-981c94afe98cd1da11aed290562ebe4a1e7a60cc/>
 
 ### Other
 
@@ -337,6 +348,8 @@ This release updates serde-yaml to v0.9.
 
 ## v2.1.1 (2017-02-13)
 
+<csr-id-f06102825d04bf245b5ff2ee931e8a45b94e9dd3/>
+
 ### Other
 
  - <csr-id-f06102825d04bf245b5ff2ee931e8a45b94e9dd3/> fix links
@@ -387,6 +400,8 @@ This release updates serde-yaml to v0.9.
 </details>
 
 ## v2.0.1 (2017-02-07)
+
+<csr-id-4dc2032561593cee1a41f2371396fade9687906c/>
 
 ### Other
 
