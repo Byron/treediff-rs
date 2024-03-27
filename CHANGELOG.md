@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 5.0.0 (2024-03-27)
+
+### Bug Fixes (BREAKING)
+
+ - <csr-id-3e665df3999895329fc12920f33acaf802723424/> replace unmaintained yaml-rust 0.4 with yaml-rust2 0.8
+   This may be a breaking change for some, hence the major version bump.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 2 commits contributed to the release.
+ - 53 days passed between releases.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Replace unmaintained yaml-rust 0.4 with yaml-rust2 0.8 ([`3e665df`](https://github.com/byron/treediff-rs/commit/3e665df3999895329fc12920f33acaf802723424))
+    - Replace unmaintained yaml-rust ([`5833bcd`](https://github.com/byron/treediff-rs/commit/5833bcd4fe7fa64a1940046e1b8b4612040b87c1))
+</details>
+
 ## 4.0.3 (2024-02-03)
 
 This release updates serde-yaml to v0.9.
@@ -13,7 +40,7 @@ This release updates serde-yaml to v0.9.
 
 <csr-read-only-do-not-edit/>
 
- - 3 commits contributed to the release over the course of 1 calendar day.
+ - 4 commits contributed to the release over the course of 1 calendar day.
  - 847 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -25,6 +52,7 @@ This release updates serde-yaml to v0.9.
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release treediff v4.0.3 ([`d8ae624`](https://github.com/byron/treediff-rs/commit/d8ae624097dd82438aaa4022c1bfd8b9ca4c74df))
     - Prepare changelog prior to release ([`d61b90c`](https://github.com/byron/treediff-rs/commit/d61b90ca0dfce93d5c58567ed029ac7c319b0c8a))
     - Merge pull request #13 from glehmann/serde-yaml-09 ([`d480652`](https://github.com/byron/treediff-rs/commit/d480652f79a9853340dfdfed462b195400a4255f))
     - Update serde_yaml to 0.9 ([`3177d4a`](https://github.com/byron/treediff-rs/commit/3177d4a6fc8226fa3fdfef656f934db0b75db541))
